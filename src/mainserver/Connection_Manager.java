@@ -26,9 +26,11 @@ public class Connection_Manager {
       server_socket.receive(receive_packet);
       InetAddress request_IP = receive_packet.getAddress();
       // block : as inputs
-      String[] variables_dirty = new String(receive_packet.getData()).split(":");
-      Map map_vars = parse_request_map(receive_packet);
-      switch (variables_dirty[0]) {
+      String messageType = "";
+      // String[] variables_dirty = new
+      // String(receive_packet.getData()).split(":");
+      Map map_vars = parse_request_map(messageType, receive_packet);
+      switch (messageType) {
       case "connect":
         connection_request(map_vars, request_IP);
         break;
@@ -67,7 +69,7 @@ public class Connection_Manager {
     }
   }
 
-  public boolean send_packets(String packet_content, InetAddress ip_to) {
+  private boolean send_packets(String packet_content, InetAddress ip_to) {
     byte[] send_data = packet_content.getBytes();
     DatagramPacket send_packet = new DatagramPacket(send_data, send_data.length, ip_to, 6789);
     try {
@@ -78,10 +80,11 @@ public class Connection_Manager {
     return true;
   }
 
-  public Map<String, String> parse_request_map(DatagramPacket incoming) {
+  private Map<String, String> parse_request_map(String message_type, DatagramPacket incoming) {
     // block : as inputs
     String[] vars_dirty = new String(incoming.getData()).split(":");
     String[] vars = Arrays.copyOfRange(vars_dirty, 1, vars_dirty.length);
+    message_type = vars_dirty[0];
     Map<String, String> map_vars = new HashMap<String, String>();
     for (String var : vars) {
       // block = as inputs
