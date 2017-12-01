@@ -17,20 +17,22 @@ public class Connection_Manager {
   private String[] connected_clients_names = new String[2];
   private DatagramSocket server_socket;
 
-  public Connection_Manager() throws IOException {
+  public Connection_Manager() throws Exception {
     server_socket = new DatagramSocket(9876);
     byte[] receiveData = new byte[512];
     while (true) {
       // check incoming requests
       DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
       server_socket.receive(receive_packet);
+      System.out.println("received something");
       InetAddress request_IP = receive_packet.getAddress();
       // block : as inputs
-      String messageType = "";
       // String[] variables_dirty = new
       // String(receive_packet.getData()).split(":");
-      Map map_vars = parse_request_map(messageType, receive_packet);
-      switch (messageType) {
+      Map map_vars = parse_request_map(receive_packet);
+      String command_type = command_parse(receive_packet);
+      System.out.println(command_type);
+      switch (command_type) {
       case "connect":
         connection_request(map_vars, request_IP);
         break;
@@ -47,8 +49,10 @@ public class Connection_Manager {
   }
 
   public void connection_request(Map vars, InetAddress client_ip) {
+    System.out.println("gay");
     // check if we have enought clients
     if (IntStream.of(clients_status).anyMatch(x -> x == 0)) {
+      System.out.println("we have space");
       String client_name = (String) vars.get("name");
       // assign it a client space
       int client_num;
@@ -65,13 +69,15 @@ public class Connection_Manager {
       String acceptance_response = "accept:id=" + client_num + ":name=" + client_name + ":UUID=" + new_client_UUID.toString() + ":status=1";
       send_packets(acceptance_response, client_ip);
     } else {
+      System.out.println("gay lamba no work");
       // already too many users connected
     }
   }
 
   private boolean send_packets(String packet_content, InetAddress ip_to) {
+    System.out.println("we got a packet outgoing  " + packet_content);
     byte[] send_data = packet_content.getBytes();
-    DatagramPacket send_packet = new DatagramPacket(send_data, send_data.length, ip_to, 6789);
+    DatagramPacket send_packet = new DatagramPacket(send_data, send_data.length, ip_to, 9875);
     try {
       server_socket.send(send_packet);
     } catch (IOException e) {
@@ -80,11 +86,10 @@ public class Connection_Manager {
     return true;
   }
 
-  private Map<String, String> parse_request_map(String message_type, DatagramPacket incoming) {
+  private Map<String, String> parse_request_map(DatagramPacket incoming) {
     // block : as inputs
     String[] vars_dirty = new String(incoming.getData()).split(":");
     String[] vars = Arrays.copyOfRange(vars_dirty, 1, vars_dirty.length);
-    message_type = vars_dirty[0];
     Map<String, String> map_vars = new HashMap<String, String>();
     for (String var : vars) {
       // block = as inputs
@@ -93,6 +98,11 @@ public class Connection_Manager {
       System.out.println(var);// debug
     }
     return map_vars;
+  }
+
+  private String command_parse(DatagramPacket incoming) {
+    String[] vars_dirty = new String(incoming.getData()).split(":");
+    return vars_dirty[0];
   }
 
   public void ping_check(Map vars, InetAddress client_ip) {

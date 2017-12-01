@@ -24,15 +24,18 @@ public class Client_Run {
 
   public Client_Run() {
     try {
-      server_ip = InetAddress.getByName("192.168.221.1");
+      server_ip = InetAddress.getByName("127.0.0.1");
     } catch (UnknownHostException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
     while (true) {
       if (!connected) {
+        System.out.println("tried");
         request_to_connect();
         response_to_connect();
+      } else {
+        System.out.println("it works!");
       }
     }
 
@@ -42,7 +45,6 @@ public class Client_Run {
     byte[] receiveData = new byte[512];
     DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
     try {
-      client_socket.setSoTimeout(60000);
       client_socket.receive(receive_packet);
       String message_type = "";
       Map variables = parse_request_map(message_type, receive_packet);
@@ -70,7 +72,7 @@ public class Client_Run {
 
   public void request_to_connect() {
     try {
-      client_socket = new DatagramSocket(server_port);
+      client_socket = new DatagramSocket(9875);
     } catch (SocketException e) {
     }
     String connection_str = "connect:name=filippo";
@@ -79,7 +81,7 @@ public class Client_Run {
 
   private boolean send_packets(String packet_content, InetAddress ip_to) {
     byte[] send_data = packet_content.getBytes();
-    DatagramPacket send_packet = new DatagramPacket(send_data, send_data.length, ip_to, 6789);
+    DatagramPacket send_packet = new DatagramPacket(send_data, send_data.length, ip_to, 9876);
     try {
       client_socket.send(send_packet);
     } catch (IOException e) {
@@ -104,6 +106,6 @@ public class Client_Run {
   }
 
   public static void main(String[] args) {
-
+    Client_Run client = new Client_Run();
   }
 }

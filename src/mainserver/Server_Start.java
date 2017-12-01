@@ -4,7 +4,12 @@ import javax.swing.*;
 
 public class Server_Start {
   public static void main(String[] args) {
-    Server_Start server = new Server_Start();
+    try {
+      Connection_Manager conn = new Connection_Manager();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    // Server_Start server = new Server_Start();
 
   }
 
