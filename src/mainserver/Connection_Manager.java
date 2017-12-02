@@ -109,12 +109,11 @@ public class Connection_Manager extends Thread {
       error = true;
     }
 
-    if (Integer.parseInt((String) vars.get("status")) == 1) {
-      CDS.clients_status[client_num] = 2;
-    }
-
     if (!error) {
       if (CDS.clients_status[client_num] == Integer.parseInt((String) vars.get("status"))) {
+        if (Integer.parseInt((String) vars.get("status")) == 1) {
+          CDS.clients_status[client_num] = 2;
+        }
         send_ping(client_num);
       } else {
         send_error(client_num, "The ping request status is wrong");

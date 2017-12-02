@@ -62,7 +62,7 @@ public class Client_Run {
       }
     } catch (SocketTimeoutException e1) {
       // nothing happened
-      System.out.println("didn't receive anything");
+      System.out.println("didn't receive anything in the wait");
     } catch (IOException e) {
       e.printStackTrace();
     }

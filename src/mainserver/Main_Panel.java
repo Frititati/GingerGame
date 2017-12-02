@@ -1,8 +1,6 @@
 package mainserver;
 
 import java.awt.BorderLayout;
-import java.util.ArrayList;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -10,6 +8,8 @@ import java.awt.*;
 public class Main_Panel extends JPanel {
   private JLabel client1_status_label;
   private JLabel client2_status_label;
+  private JLabel client1_last_connect;
+  private JLabel client2_last_connect;
   private int client1_status, client2_status;
   private String[] client_status_list = { "disconnected", "connecting", "connected", "playing" };
   Color[] client_status_colors = { Color.GRAY, Color.BLUE, Color.GREEN, Color.RED };
@@ -22,14 +22,18 @@ public class Main_Panel extends JPanel {
     JPanel client1_panel = new JPanel();
     JLabel client1 = new JLabel("Client 1");
     client1_status_label = new JLabel();
+    client1_last_connect = new JLabel("0");
     client1_panel.add(client1);
     client1_panel.add(client1_status_label);
+    client1_panel.add(client1_last_connect);
 
     JPanel client2_panel = new JPanel();
     JLabel client2 = new JLabel("Client 2");
     client2_status_label = new JLabel();
+    client2_last_connect = new JLabel("0");
     client2_panel.add(client2);
     client2_panel.add(client2_status_label);
+    client2_panel.add(client2_last_connect);
 
     inner_panel.add(client1_panel, BorderLayout.NORTH);
     inner_panel.add(client2_panel, BorderLayout.SOUTH);
@@ -55,5 +59,15 @@ public class Main_Panel extends JPanel {
     inner_panel.repaint();
     inner_panel.revalidate();
     return true;
+  }
+
+  public void set_last_ping(int client_num, int seconds) {
+    if (client_num == 0) {
+      client1_last_connect.setText(seconds + " ms");
+    } else if (client_num == 1) {
+      client2_last_connect.setText(seconds + " ms");
+    }
+    inner_panel.repaint();
+    inner_panel.revalidate();
   }
 }

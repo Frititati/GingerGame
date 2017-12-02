@@ -31,14 +31,21 @@ public class Server_Start extends Thread {
       }
       CDS.GUI_editor.set_status(0, CDS.clients_status[0]);
       CDS.GUI_editor.set_status(1, CDS.clients_status[1]);
+      long temp = System.currentTimeMillis();
+      if (CDS.clients_status[0] > 0) {
+        CDS.GUI_editor.set_last_ping(0, (int) (temp - CDS.last_ping_clients[0]));
+      }
+      if (CDS.clients_status[1] > 0) {
+        CDS.GUI_editor.set_last_ping(1, (int) (temp - CDS.last_ping_clients[1]));
+      }
       if (randomizer == count) {
-        randomizer = (int) (Math.random() * 10 + 5);
+        randomizer = (int) (Math.random() * 7 + 2);
         count = -1;
-        long temp = System.currentTimeMillis();
-        if ((CDS.last_ping_clients[0] - temp) > 30000) {
+        temp = System.currentTimeMillis();
+        if (((temp - CDS.last_ping_clients[0]) > 30000) && CDS.clients_status[0] > 0) {
           System.out.println("client 0 has been disconnected for more then 30 seconds");
         }
-        if ((CDS.last_ping_clients[1] - temp) > 30000) {
+        if (((temp - CDS.last_ping_clients[1]) > 30000) && CDS.clients_status[1] > 0) {
           System.out.println("client 1 has been disconnected for more then 30 seconds");
         }
       }
