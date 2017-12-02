@@ -32,8 +32,36 @@ public class Client_Run {
         request_to_connect();
         response_to_connect();
       } else {
-        System.out.println("it works!");
+        wait_for_command();
+        send_ping();
+        receive_ping();
       }
+    }
+  }
+
+  private void wait_for_command() {
+    byte[] receiveData = new byte[512];
+    DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
+    try {
+      client_socket.setSoTimeout(30000); // 30 seconds
+      client_socket.receive(receive_packet);
+      String command_type = command_parse(receive_packet);
+      Map variables = parse_request_map(receive_packet);
+      switch (command_type) {
+      case "error":
+        System.out.println(variables.get("message"));
+        break;
+      case "startplay":
+        System.out.println("yay");
+        break;
+      default:
+        System.out.println("bad request");
+      }
+    } catch (SocketTimeoutException e1) {
+      // nothing happened
+      System.out.println("didn't receive anything");
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
@@ -59,12 +87,11 @@ public class Client_Run {
         }
         break;
       default:
-        System.out.println("broken");
+        System.out.println("not error or accept");
       }
     } catch (SocketTimeoutException e1) {
       System.out.println("timed out");
     } catch (Exception e) {
-      System.out.println("Couldn't receive");
       e.printStackTrace();
     }
   }
@@ -93,7 +120,6 @@ public class Client_Run {
 
   private Map<String, String> parse_request_map(DatagramPacket incoming) {
     // block : as inputs
-    System.out.println("Packet Incoming " + new String(incoming.getData()));
     String[] vars_dirty = new String(incoming.getData()).split(":");
     // String[] vars = Arrays.copyOfRange(vars_dirty, 1, vars_dirty.length);
     Map<String, String> map_vars = new HashMap<String, String>();
@@ -101,7 +127,7 @@ public class Client_Run {
       // block = as inputs
       String[] temp = vars_dirty[i].split("=");
       map_vars.put(temp[0], temp[1]);
-      System.out.println("Packet Content " + temp[1]);
+      // System.out.println("Packet Content " + temp[1]);
     }
     return map_vars;
   }
@@ -120,18 +146,46 @@ public class Client_Run {
       for (int j = 0; j < keys.length; j++) {
         packet_string += keys[j] + "=" + values[j] + ":";
       }
-      System.out.println(packet_string);
+      // System.out.println(packet_string);
 
       return packet_string.getBytes();
     }
   }
 
-  private void send_ping(int client_num) {
+  private void send_ping() {
     String command_word = "ping";
     String[] keys = { "UUID", "status" };
     String[] values = { uuid.toString(), Integer.toString(status) };
     byte[] send_ping_data = create_packet_string(command_word, keys, values);
     send_packets(send_ping_data, server_ip);
+    System.out.println("sent ping");
+  }
+
+  private void receive_ping() {
+    byte[] receiveData = new byte[512];
+    DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
+    try {
+      client_socket.setSoTimeout(5000); // 5 seconds
+      client_socket.receive(receive_packet);
+      String command_type = command_parse(receive_packet);
+      Map variables = parse_request_map(receive_packet);
+      switch (command_type) {
+      case "error":
+        System.out.println(variables.get("message"));
+        break;
+      case "pingback":
+        System.out.println("received ping");
+        break;
+      default:
+        System.out.println("not error or ping");
+      }
+    } catch (SocketTimeoutException e1) {
+      // nothing happened
+      System.out.println("didn't receive anything back");
+      status = 0;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   public static void main(String[] args) {

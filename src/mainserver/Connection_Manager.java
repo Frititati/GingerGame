@@ -10,10 +10,8 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 
 public class Connection_Manager {
-  private int[] clients_status = { 0, 0 };
   private InetAddress[] clients_IPs = new InetAddress[2];
   private UUID[] clients_UUID = new UUID[2];
-  private String[] connected_clients_names = new String[2];
   private DatagramSocket server_socket;
 
   public Connection_Manager() throws Exception {
@@ -29,7 +27,6 @@ public class Connection_Manager {
       // String(receive_packet.getData()).split(":");
       Map map_vars = parse_request_map(receive_packet);
       String command_type = command_parse(receive_packet);
-      System.out.println(command_type);
       switch (command_type) {
       case "connect":
         connection_request(map_vars, request_IP);
@@ -43,26 +40,26 @@ public class Connection_Manager {
 
   public void connection_request(Map vars, InetAddress client_ip) {
     // check if we have enought clients
-    if (IntStream.of(clients_status).anyMatch(x -> x == 0)) {
+    if (IntStream.of(CDS.clients_status).anyMatch(x -> x == 0)) {
       String client_name = (String) vars.get("name");
       // assign it a client space
       int client_num;
-      if (clients_status[0] == 0) {
+      if (CDS.clients_status[0] == 0) {
         client_num = 0;
       } else {
         client_num = 1;
       }
       UUID new_client_UUID = UUID.randomUUID();
       clients_UUID[client_num] = new_client_UUID;
-      connected_clients_names[client_num] = client_name;
+      CDS.connected_clients_names[client_num] = client_name;
       clients_IPs[client_num] = client_ip;
-      clients_status[client_num] = 1;
+      CDS.clients_status[client_num] = 1;
       String[] keys = { "id", "name", "UUID", "status" };
       String[] values = { Integer.toString(client_num), client_name, new_client_UUID.toString(), "1" };
       byte[] send_packet = create_packet_string("accept", keys, values);
       send_packets(send_packet, client_ip);
     } else {
-      System.out.println("gay lamba no work");
+      System.out.println("filled all positions or lambda don't work");
       // already too many users connected
     }
   }
@@ -87,7 +84,7 @@ public class Connection_Manager {
       // block = as inputs
       String[] temp = vars_dirty[i].split("=");
       map_vars.put(temp[0], temp[1]);
-      System.out.println("Packet Content " + temp[1]);
+      // System.out.println("Packet Content " + temp[1]);
     }
     return map_vars;
   }
@@ -105,7 +102,7 @@ public class Connection_Manager {
     }
 
     if (!error) {
-      if (clients_status[client_num] == (int) vars.get("status")) {
+      if (CDS.clients_status[client_num] == Integer.parseInt((String) vars.get("status"))) {
         send_ping(client_num);
       } else {
         send_error(client_num, "The ping request status is wrong");
@@ -126,7 +123,7 @@ public class Connection_Manager {
   private void send_ping(int client_num) {
     String command_word = "pingback";
     String[] keys = { "UUID", "status" };
-    String[] values = { clients_UUID[client_num].toString(), Integer.toString(clients_status[client_num]) };
+    String[] values = { clients_UUID[client_num].toString(), Integer.toString(CDS.clients_status[client_num]) };
     byte[] send_ping_data = create_packet_string(command_word, keys, values);
     send_packets(send_ping_data, clients_IPs[client_num]);
   }
@@ -140,7 +137,7 @@ public class Connection_Manager {
       for (int j = 0; j < keys.length; j++) {
         packet_string += keys[j] + "=" + values[j] + ":";
       }
-      System.out.println(packet_string);
+      // System.out.println(packet_string);
 
       return packet_string.getBytes();
     }
