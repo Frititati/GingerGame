@@ -7,7 +7,6 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -15,30 +14,27 @@ import java.util.UUID;
 public class Client_Run {
   private int status = 0;
   private InetAddress server_ip;
-  private int server_port;
+  private int server_port = 9876;
   private DatagramSocket client_socket;
   private boolean connected = false;
   private int id;
-  private String name;
+  private String name = "filippo";
   private UUID uuid;
 
   public Client_Run() {
     try {
       server_ip = InetAddress.getByName("127.0.0.1");
     } catch (UnknownHostException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     while (true) {
       if (!connected) {
-        System.out.println("tried");
         request_to_connect();
         response_to_connect();
       } else {
         System.out.println("it works!");
       }
     }
-
   }
 
   private void response_to_connect() {
@@ -46,18 +42,21 @@ public class Client_Run {
     DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
     try {
       client_socket.receive(receive_packet);
-      String message_type = "";
-      Map variables = parse_request_map(message_type, receive_packet);
-      switch (message_type) {
+      String command_type = command_parse(receive_packet);
+      Map variables = parse_request_map(receive_packet);
+      switch (command_type) {
       case "error":
         System.out.println(variables.get("message"));
         break;
       case "accept":
-        id = (int) variables.get(id);
-        uuid = (UUID) variables.get("UUID");
-        status = (int) variables.get("status");
-        connected = true;
-        System.out.println("somehow it worked"); // need to add test cases
+        if (((String) variables.get("name")).equals(name)) {
+          id = Integer.parseInt((String) variables.get("id"));
+          uuid = UUID.fromString((String) variables.get("UUID"));
+          status = Integer.parseInt((String) variables.get("status"));
+          connected = true;
+        } else {
+          System.out.println("Wrong username back, restart connect");
+        }
         break;
       default:
         System.out.println("broken");
@@ -70,18 +69,20 @@ public class Client_Run {
     }
   }
 
-  public void request_to_connect() {
+  private void request_to_connect() {
     try {
       client_socket = new DatagramSocket(9875);
     } catch (SocketException e) {
     }
-    String connection_str = "connect:name=filippo";
-    send_packets(connection_str, server_ip);
+    String[] keys = { "name" };
+    String[] values = { name };
+    byte[] send_packet = create_packet_string("connect", keys, values);
+    send_packets(send_packet, server_ip);
   }
 
-  private boolean send_packets(String packet_content, InetAddress ip_to) {
-    byte[] send_data = packet_content.getBytes();
-    DatagramPacket send_packet = new DatagramPacket(send_data, send_data.length, ip_to, 9876);
+  private boolean send_packets(byte[] packet_content, InetAddress ip_to) {
+    byte[] send_data = packet_content;
+    DatagramPacket send_packet = new DatagramPacket(send_data, send_data.length, ip_to, server_port);
     try {
       client_socket.send(send_packet);
     } catch (IOException e) {
@@ -90,22 +91,51 @@ public class Client_Run {
     return true;
   }
 
-  private Map<String, String> parse_request_map(String message_type, DatagramPacket incoming) {
+  private Map<String, String> parse_request_map(DatagramPacket incoming) {
     // block : as inputs
+    System.out.println("Packet Incoming " + new String(incoming.getData()));
     String[] vars_dirty = new String(incoming.getData()).split(":");
-    String[] vars = Arrays.copyOfRange(vars_dirty, 1, vars_dirty.length);
-    message_type = vars_dirty[0];
+    // String[] vars = Arrays.copyOfRange(vars_dirty, 1, vars_dirty.length);
     Map<String, String> map_vars = new HashMap<String, String>();
-    for (String var : vars) {
+    for (int i = 1; i < (vars_dirty.length - 1); i++) {
       // block = as inputs
-      String[] temp = var.split("=");
+      String[] temp = vars_dirty[i].split("=");
       map_vars.put(temp[0], temp[1]);
-      System.out.println(var);// debug
+      System.out.println("Packet Content " + temp[1]);
     }
     return map_vars;
+  }
+
+  private String command_parse(DatagramPacket incoming) {
+    String[] vars_dirty = new String(incoming.getData()).split(":");
+    return vars_dirty[0];
+  }
+
+  private byte[] create_packet_string(String command_word, String[] keys, String[] values) {
+    if (keys.length != values.length) {
+      System.out.println("The the command: " + command_word + " the keys and values don't match");
+      throw new ArrayIndexOutOfBoundsException();
+    } else {
+      String packet_string = command_word + ":";
+      for (int j = 0; j < keys.length; j++) {
+        packet_string += keys[j] + "=" + values[j] + ":";
+      }
+      System.out.println(packet_string);
+
+      return packet_string.getBytes();
+    }
+  }
+
+  private void send_ping(int client_num) {
+    String command_word = "ping";
+    String[] keys = { "UUID", "status" };
+    String[] values = { uuid.toString(), Integer.toString(status) };
+    byte[] send_ping_data = create_packet_string(command_word, keys, values);
+    send_packets(send_ping_data, server_ip);
   }
 
   public static void main(String[] args) {
     Client_Run client = new Client_Run();
   }
+
 }

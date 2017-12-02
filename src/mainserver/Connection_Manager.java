@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -24,7 +23,6 @@ public class Connection_Manager {
       // check incoming requests
       DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
       server_socket.receive(receive_packet);
-      System.out.println("received something");
       InetAddress request_IP = receive_packet.getAddress();
       // block : as inputs
       // String[] variables_dirty = new
@@ -40,19 +38,12 @@ public class Connection_Manager {
         ping_check(map_vars, request_IP);
         break;
       }
-
-      // if (!active_connections.contains(request_IP)) {
-      // active_connections.add(request_IP);
-      // }
-
     }
   }
 
   public void connection_request(Map vars, InetAddress client_ip) {
-    System.out.println("gay");
     // check if we have enought clients
     if (IntStream.of(clients_status).anyMatch(x -> x == 0)) {
-      System.out.println("we have space");
       String client_name = (String) vars.get("name");
       // assign it a client space
       int client_num;
@@ -66,17 +57,18 @@ public class Connection_Manager {
       connected_clients_names[client_num] = client_name;
       clients_IPs[client_num] = client_ip;
       clients_status[client_num] = 1;
-      String acceptance_response = "accept:id=" + client_num + ":name=" + client_name + ":UUID=" + new_client_UUID.toString() + ":status=1";
-      send_packets(acceptance_response, client_ip);
+      String[] keys = { "id", "name", "UUID", "status" };
+      String[] values = { Integer.toString(client_num), client_name, new_client_UUID.toString(), "1" };
+      byte[] send_packet = create_packet_string("accept", keys, values);
+      send_packets(send_packet, client_ip);
     } else {
       System.out.println("gay lamba no work");
       // already too many users connected
     }
   }
 
-  private boolean send_packets(String packet_content, InetAddress ip_to) {
-    System.out.println("we got a packet outgoing  " + packet_content);
-    byte[] send_data = packet_content.getBytes();
+  private boolean send_packets(byte[] packet_content, InetAddress ip_to) {
+    byte[] send_data = packet_content;
     DatagramPacket send_packet = new DatagramPacket(send_data, send_data.length, ip_to, 9875);
     try {
       server_socket.send(send_packet);
@@ -89,25 +81,19 @@ public class Connection_Manager {
   private Map<String, String> parse_request_map(DatagramPacket incoming) {
     // block : as inputs
     String[] vars_dirty = new String(incoming.getData()).split(":");
-    String[] vars = Arrays.copyOfRange(vars_dirty, 1, vars_dirty.length);
+    // String[] vars = Arrays.copyOfRange(vars_dirty, 1, vars_dirty.length);
     Map<String, String> map_vars = new HashMap<String, String>();
-    for (String var : vars) {
+    for (int i = 1; i < (vars_dirty.length - 1); i++) {
       // block = as inputs
-      String[] temp = var.split("=");
+      String[] temp = vars_dirty[i].split("=");
       map_vars.put(temp[0], temp[1]);
-      System.out.println(var);// debug
+      System.out.println("Packet Content " + temp[1]);
     }
     return map_vars;
   }
 
-  private String command_parse(DatagramPacket incoming) {
-    String[] vars_dirty = new String(incoming.getData()).split(":");
-    return vars_dirty[0];
-  }
-
-  public void ping_check(Map vars, InetAddress client_ip) {
-    String UUID_str = (String) vars.get("UUID");
-    UUID UUID_temp = UUID.fromString(UUID_str);
+  private void ping_check(Map vars, InetAddress client_ip) {
+    UUID UUID_temp = UUID.fromString((String) vars.get("UUID"));
     int client_num = -1;
     boolean error = false;
     if (UUID_temp.equals(clients_UUID[0])) {
@@ -118,16 +104,50 @@ public class Connection_Manager {
       error = true;
     }
 
-    String message = "";
     if (!error) {
       if (clients_status[client_num] == (int) vars.get("status")) {
-        message = "ping:UUID=" + UUID_str + ":status=" + clients_status[client_num];
+        send_ping(client_num);
       } else {
-        message = "error:message=The ping request status is wrong";
+        send_error(client_num, "The ping request status is wrong");
       }
     } else {
-      message = "error:message=The ping request UUID is wrong";
+      send_error(client_num, "The ping request UUID is wrong");
     }
-    send_packets(message, client_ip);
+  }
+
+  private void send_error(int client_num, String error_message) {
+    String command_word = "error";
+    String[] keys = { "message" };
+    String[] values = { error_message };
+    byte[] send_error_data = create_packet_string(command_word, keys, values);
+    send_packets(send_error_data, clients_IPs[client_num]);
+  }
+
+  private void send_ping(int client_num) {
+    String command_word = "pingback";
+    String[] keys = { "UUID", "status" };
+    String[] values = { clients_UUID[client_num].toString(), Integer.toString(clients_status[client_num]) };
+    byte[] send_ping_data = create_packet_string(command_word, keys, values);
+    send_packets(send_ping_data, clients_IPs[client_num]);
+  }
+
+  private byte[] create_packet_string(String command_word, String[] keys, String[] values) {
+    if (keys.length != values.length) {
+      System.out.println("The the command: " + command_word + " the keys and values don't match");
+      throw new ArrayIndexOutOfBoundsException();
+    } else {
+      String packet_string = command_word + ":";
+      for (int j = 0; j < keys.length; j++) {
+        packet_string += keys[j] + "=" + values[j] + ":";
+      }
+      System.out.println(packet_string);
+
+      return packet_string.getBytes();
+    }
+  }
+
+  private String command_parse(DatagramPacket incoming) {
+    String[] vars_dirty = new String(incoming.getData()).split(":");
+    return vars_dirty[0];
   }
 }
