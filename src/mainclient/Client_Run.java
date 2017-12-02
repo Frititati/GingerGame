@@ -31,6 +31,9 @@ public class Client_Run {
       if (!connected) {
         request_to_connect();
         response_to_connect();
+
+        send_ping();
+        receive_ping();
       } else {
         wait_for_command();
         send_ping();
@@ -43,7 +46,7 @@ public class Client_Run {
     byte[] receiveData = new byte[512];
     DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
     try {
-      client_socket.setSoTimeout(30000); // 30 seconds
+      client_socket.setSoTimeout(10000); // 30 seconds
       client_socket.receive(receive_packet);
       String command_type = command_parse(receive_packet);
       Map variables = parse_request_map(receive_packet);
@@ -174,6 +177,7 @@ public class Client_Run {
         System.out.println(variables.get("message"));
         break;
       case "pingback":
+        status = Integer.parseInt((String) variables.get("status"));
         System.out.println("received ping");
         break;
       default:

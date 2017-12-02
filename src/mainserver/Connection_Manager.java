@@ -9,32 +9,40 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
-public class Connection_Manager {
+public class Connection_Manager extends Thread {
   private InetAddress[] clients_IPs = new InetAddress[2];
   private UUID[] clients_UUID = new UUID[2];
   private DatagramSocket server_socket;
 
-  public Connection_Manager() throws Exception {
-    server_socket = new DatagramSocket(9876);
-    byte[] receiveData = new byte[512];
-    while (true) {
-      // check incoming requests
-      DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
-      server_socket.receive(receive_packet);
-      InetAddress request_IP = receive_packet.getAddress();
-      // block : as inputs
-      // String[] variables_dirty = new
-      // String(receive_packet.getData()).split(":");
-      Map map_vars = parse_request_map(receive_packet);
-      String command_type = command_parse(receive_packet);
-      switch (command_type) {
-      case "connect":
-        connection_request(map_vars, request_IP);
-        break;
-      case "ping":
-        ping_check(map_vars, request_IP);
-        break;
+  public Connection_Manager() {
+    this.start();
+  }
+
+  public void run() {
+    try {
+      server_socket = new DatagramSocket(9876);
+      byte[] receiveData = new byte[512];
+      while (true) {
+        // check incoming requests
+        DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
+        server_socket.receive(receive_packet);
+        InetAddress request_IP = receive_packet.getAddress();
+        // block : as inputs
+        // String[] variables_dirty = new
+        // String(receive_packet.getData()).split(":");
+        Map map_vars = parse_request_map(receive_packet);
+        String command_type = command_parse(receive_packet);
+        switch (command_type) {
+        case "connect":
+          connection_request(map_vars, request_IP);
+          break;
+        case "ping":
+          ping_check(map_vars, request_IP);
+          break;
+        }
       }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
@@ -101,6 +109,10 @@ public class Connection_Manager {
       error = true;
     }
 
+    if (Integer.parseInt((String) vars.get("status")) == 1) {
+      CDS.clients_status[client_num] = 2;
+    }
+
     if (!error) {
       if (CDS.clients_status[client_num] == Integer.parseInt((String) vars.get("status"))) {
         send_ping(client_num);
@@ -110,6 +122,7 @@ public class Connection_Manager {
     } else {
       send_error(client_num, "The ping request UUID is wrong");
     }
+    CDS.last_ping_clients[client_num] = System.currentTimeMillis();
   }
 
   private void send_error(int client_num, String error_message) {
