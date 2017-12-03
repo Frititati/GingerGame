@@ -164,12 +164,17 @@ public class Connection_Manager extends Thread {
   }
 
   public void start_game() {
-    for (int i = 0; i < 2; i++) {
-      String[] keys = { "UUID", "status" };
-      String[] values = { clients_UUID[i].toString(), "3" };
-      byte[] packets_start = create_packet_bytes("playstart", keys, values);
-      send_packets(packets_start, clients_IPs[i]);
-      Log.log(1, "Sent packets to start the game");
-    }
+    String[] keys = { "UUID", "status" };
+    String[] values = { clients_UUID[0].toString(), "3" };
+    byte[] packets_start = create_packet_bytes("playstart", keys, values);
+    send_packets(packets_start, clients_IPs[0]);
+    Log.log(1, "Sent packets to start the game");
+    // for (int i = 0; i < 2; i++) {
+    // String[] keys = { "UUID", "status" };
+    // String[] values = { clients_UUID[i].toString(), "3" };
+    // byte[] packets_start = create_packet_bytes("playstart", keys, values);
+    // send_packets(packets_start, clients_IPs[i]);
+    // Log.log(1, "Sent packets to start the game");
+    // }
   }
 }

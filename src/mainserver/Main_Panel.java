@@ -85,11 +85,11 @@ public class Main_Panel extends JPanel {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (CDS.clients_status[0] == 2 && CDS.clients_status[1] == 2) {
-          CDS.conn.start_game();
-        } else {
-          Log.log(0, "There aren't 2 connected users");
-        }
+        // if (CDS.clients_status[0] == 2 && CDS.clients_status[1] == 2) {
+        CDS.conn.start_game();
+        // } else {
+        // Log.log(0, "There aren't 2 connected users");
+        // }
         // String[] keys = { "message" };
         // String[] values = { "I love pie, i have love" };
         // CDS.conn.send_packets(CDS.conn.create_packet_bytes("error", keys,
