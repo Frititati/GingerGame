@@ -41,10 +41,51 @@ public class Connection_Manager extends Thread {
         case "ping":
           ping_check(map_vars, request_IP);
           break;
+        case "playakk":
+          ask_map(map_vars, request_IP);
+          break;
+        case "mapakk":
+
+          break;
+        default:
+          System.out.println("filtered wrong request");
         }
       }
     } catch (Exception e) {
       e.printStackTrace();
+    }
+  }
+
+  private void ask_map(Map vars, InetAddress request_IP) {
+    UUID UUID_temp = UUID.fromString((String) vars.get("UUID"));
+    int client_num = -1;
+    boolean error = false;
+    if (UUID_temp.equals(clients_UUID[0])) {
+      client_num = 0;
+    } else if (UUID_temp.equals(clients_UUID[1])) {
+      client_num = 1;
+    } else {
+      error = true;
+    }
+
+    int row_count = 0;
+    if (client_num == 0) {
+      while (!CDS.client1_map[row_count].equals("")) {
+        row_count++;
+      }
+    } else if (client_num == 1) {
+      while (!CDS.client2_map[row_count].equals("")) {
+        row_count++;
+      }
+    }
+
+    if (!error) {
+      String[] keys = { "UUID", "row" };
+      String[] values = { clients_UUID[client_num].toString(), row_count + "" };
+      byte[] ask_map_byte = create_packet_bytes("mapreq", keys, values);
+      send_packets(ask_map_byte, request_IP);
+    } else {
+      send_error(client_num, "The UUID is not correct and you are suspicious");
     }
   }
 

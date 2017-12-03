@@ -6,4 +6,7 @@ public class CDS {
   public static Main_Panel GUI_editor;
   public static Connection_Manager conn;
   public static long[] last_ping_clients = { 0, 0 };
+  public static String[] client1_map = { "", "", "", "" };
+  public static String[] client2_map = { "", "", "", "" };
+
 }

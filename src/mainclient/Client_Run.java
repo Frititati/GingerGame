@@ -34,16 +34,45 @@ public class Client_Run {
         send_ping();
         receive_ping();
       } else if (status == 3) {
-
+        wait_play_command();
+        send_ping();
+        receive_ping();
       } else {
-        wait_for_command();
+        wait_idle_command();
         send_ping();
         receive_ping();
       }
     }
   }
 
-  private void wait_for_command() {
+  private void wait_play_command() {
+    byte[] receiveData = new byte[512];
+    DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
+    try {
+      client_socket.setSoTimeout(10000); // 10 seconds
+      client_socket.receive(receive_packet);
+      String command_type = command_parse(receive_packet);
+      Map variables = parse_request_map(receive_packet);
+      switch (command_type) {
+      case "error":
+        System.out.println(variables.get("message"));
+        break;
+      case "playstart":
+        check_play_status(variables);
+        System.out.println("yay");
+        break;
+      default:
+        System.out.println("bad request");
+      }
+    } catch (SocketTimeoutException e1) {
+      // nothing happened
+      System.out.println("didn't receive anything in the wait");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void wait_idle_command() {
     byte[] receiveData = new byte[512];
     DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
     try {
@@ -129,6 +158,7 @@ public class Client_Run {
       String[] values = { uuid.toString(), Integer.toString(status) };
       byte[] send_play_akk = create_packet_string("playakk", keys, values);
       send_packets(send_play_akk);
+      // start map making and the AI
     } else {
       System.out.println("someone strange wants to connect to you");
     }
