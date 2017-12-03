@@ -16,7 +16,6 @@ public class Client_Run {
   private InetAddress server_ip;
   private int server_port = 9876;
   private DatagramSocket client_socket;
-  private boolean connected = false;
   private int id;
   private String name = "filippo";
   private UUID uuid;
@@ -28,12 +27,14 @@ public class Client_Run {
       e.printStackTrace();
     }
     while (true) {
-      if (!connected) {
+      if (status < 1) {
         request_to_connect();
         response_to_connect();
 
         send_ping();
         receive_ping();
+      } else if (status == 3) {
+
       } else {
         wait_for_command();
         send_ping();
@@ -54,7 +55,8 @@ public class Client_Run {
       case "error":
         System.out.println(variables.get("message"));
         break;
-      case "startplay":
+      case "playstart":
+        check_play_status(variables);
         System.out.println("yay");
         break;
       default:
@@ -84,7 +86,6 @@ public class Client_Run {
           id = Integer.parseInt((String) variables.get("id"));
           uuid = UUID.fromString((String) variables.get("UUID"));
           status = Integer.parseInt((String) variables.get("status"));
-          connected = true;
         } else {
           System.out.println("Wrong username back, restart connect");
         }
@@ -107,18 +108,30 @@ public class Client_Run {
     String[] keys = { "name" };
     String[] values = { name };
     byte[] send_packet = create_packet_string("connect", keys, values);
-    send_packets(send_packet, server_ip);
+    send_packets(send_packet);
   }
 
-  private boolean send_packets(byte[] packet_content, InetAddress ip_to) {
+  private boolean send_packets(byte[] packet_content) {
     byte[] send_data = packet_content;
-    DatagramPacket send_packet = new DatagramPacket(send_data, send_data.length, ip_to, server_port);
+    DatagramPacket send_packet = new DatagramPacket(send_data, send_data.length, server_ip, server_port);
     try {
       client_socket.send(send_packet);
     } catch (IOException e) {
       return false;
     }
     return true;
+  }
+
+  private void check_play_status(Map variables) {
+    if (UUID.fromString((String) variables.get("UUID")) == uuid) {
+      status = Integer.parseInt((String) variables.get("status"));
+      String[] keys = { "UUID", "status" };
+      String[] values = { uuid.toString(), Integer.toString(status) };
+      byte[] send_play_akk = create_packet_string("playakk", keys, values);
+      send_packets(send_play_akk);
+    } else {
+      System.out.println("someone strange wants to connect to you");
+    }
   }
 
   private Map<String, String> parse_request_map(DatagramPacket incoming) {
@@ -160,7 +173,7 @@ public class Client_Run {
     String[] keys = { "UUID", "status" };
     String[] values = { uuid.toString(), Integer.toString(status) };
     byte[] send_ping_data = create_packet_string(command_word, keys, values);
-    send_packets(send_ping_data, server_ip);
+    send_packets(send_ping_data);
     System.out.println("sent ping");
   }
 
