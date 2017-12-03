@@ -158,7 +158,7 @@ public class Connection_Manager extends Thread {
     }
   }
 
-  private String command_parse(DatagramPacket incoming) {
+  public String command_parse(DatagramPacket incoming) {
     String[] vars_dirty = new String(incoming.getData()).split(":");
     return vars_dirty[0];
   }
