@@ -5,7 +5,7 @@ import javax.swing.JFrame;
 public class Server_Start extends Thread {
 
   public static void main(String[] args) {
-    Connection_Manager conn = new Connection_Manager();
+    CDS.conn = new Connection_Manager();
     Server_Start server = new Server_Start();
   }
 

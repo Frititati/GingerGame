@@ -1,9 +1,13 @@
 package mainserver;
 
 import java.awt.BorderLayout;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class Main_Panel extends JPanel {
   private JLabel client1_status_label;
@@ -35,9 +39,14 @@ public class Main_Panel extends JPanel {
     client2_panel.add(client2_status_label);
     client2_panel.add(client2_last_connect);
 
+    JButton start_button = new JButton("Start");
+    start_button.addActionListener(test());
+
     inner_panel.add(client1_panel, BorderLayout.NORTH);
-    inner_panel.add(client2_panel, BorderLayout.SOUTH);
+    inner_panel.add(client2_panel, BorderLayout.WEST);
+    inner_panel.add(start_button, BorderLayout.SOUTH);
     inner_panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
     add(inner_panel);
   }
 
@@ -69,5 +78,23 @@ public class Main_Panel extends JPanel {
     }
     inner_panel.repaint();
     inner_panel.revalidate();
+  }
+
+  public ActionListener test() {
+    return new ActionListener() {
+
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if (CDS.clients_status[0] == 2 && CDS.clients_status[1] == 2) {
+          CDS.conn.start_game();
+        } else {
+          Log.log(0, "There aren't 2 connected users");
+        }
+        // String[] keys = { "message" };
+        // String[] values = { "I love pie, i have love" };
+        // CDS.conn.send_packets(CDS.conn.create_packet_bytes("error", keys,
+        // values), CDS.conn.clients_IPs[0]);
+      }
+    };
   }
 }

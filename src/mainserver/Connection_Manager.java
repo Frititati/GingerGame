@@ -9,8 +9,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
+import mainclient.Client_Run;
+
 public class Connection_Manager extends Thread {
-  private InetAddress[] clients_IPs = new InetAddress[2];
+  public InetAddress[] clients_IPs = new InetAddress[2];
   private UUID[] clients_UUID = new UUID[2];
   private DatagramSocket server_socket;
 
@@ -64,15 +66,16 @@ public class Connection_Manager extends Thread {
       CDS.clients_status[client_num] = 1;
       String[] keys = { "id", "name", "UUID", "status" };
       String[] values = { Integer.toString(client_num), client_name, new_client_UUID.toString(), "1" };
-      byte[] send_packet = create_packet_string("accept", keys, values);
+      byte[] send_packet = create_packet_bytes("accept", keys, values);
       send_packets(send_packet, client_ip);
+      Log.log(1, "client named: " + client_name + " has connected");
     } else {
-      System.out.println("filled all positions or lambda don't work");
+      Log.log(0, "Too many users tried to play");
       // already too many users connected
     }
   }
 
-  private boolean send_packets(byte[] packet_content, InetAddress ip_to) {
+  public boolean send_packets(byte[] packet_content, InetAddress ip_to) {
     byte[] send_data = packet_content;
     DatagramPacket send_packet = new DatagramPacket(send_data, send_data.length, ip_to, 9875);
     try {
@@ -128,7 +131,7 @@ public class Connection_Manager extends Thread {
     String command_word = "error";
     String[] keys = { "message" };
     String[] values = { error_message };
-    byte[] send_error_data = create_packet_string(command_word, keys, values);
+    byte[] send_error_data = create_packet_bytes(command_word, keys, values);
     send_packets(send_error_data, clients_IPs[client_num]);
   }
 
@@ -136,11 +139,11 @@ public class Connection_Manager extends Thread {
     String command_word = "pingback";
     String[] keys = { "UUID", "status" };
     String[] values = { clients_UUID[client_num].toString(), Integer.toString(CDS.clients_status[client_num]) };
-    byte[] send_ping_data = create_packet_string(command_word, keys, values);
+    byte[] send_ping_data = create_packet_bytes(command_word, keys, values);
     send_packets(send_ping_data, clients_IPs[client_num]);
   }
 
-  private byte[] create_packet_string(String command_word, String[] keys, String[] values) {
+  public byte[] create_packet_bytes(String command_word, String[] keys, String[] values) {
     if (keys.length != values.length) {
       System.out.println("The the command: " + command_word + " the keys and values don't match");
       throw new ArrayIndexOutOfBoundsException();
@@ -158,5 +161,15 @@ public class Connection_Manager extends Thread {
   private String command_parse(DatagramPacket incoming) {
     String[] vars_dirty = new String(incoming.getData()).split(":");
     return vars_dirty[0];
+  }
+
+  public void start_game() {
+    for (int i = 0; i < 2; i++) {
+      String[] keys = { "UUID", "status" };
+      String[] values = { clients_UUID[i].toString(), "3" };
+      byte[] packets_start = create_packet_bytes("playstart", keys, values);
+      send_packets(packets_start, clients_IPs[i]);
+      Log.log(1, "Sent packets to start the game");
+    }
   }
 }
