@@ -16,6 +16,7 @@ public class Server_Start extends Thread {
     frame.pack();
     frame.setVisible(true);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setSize(300, 300);
     this.start();
   }
 

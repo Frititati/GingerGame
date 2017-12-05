@@ -45,7 +45,7 @@ public class Connection_Manager extends Thread {
           ask_map(map_vars, request_IP);
           break;
         case "mapakk":
-
+          add_map(map_vars, request_IP);
           break;
         default:
           System.out.println("filtered wrong request");
@@ -53,6 +53,32 @@ public class Connection_Manager extends Thread {
       }
     } catch (Exception e) {
       e.printStackTrace();
+    }
+  }
+
+  private void add_map(Map vars, InetAddress request_IP) {
+    UUID UUID_temp = UUID.fromString((String) vars.get("UUID"));
+    int row_sent = Integer.parseInt((String) vars.get("row"));
+    String row_data = (String) vars.get("data");
+    int client_num = -1;
+    boolean error = false;
+    if (UUID_temp.equals(clients_UUID[0])) {
+      client_num = 0;
+    } else if (UUID_temp.equals(clients_UUID[1])) {
+      client_num = 1;
+    } else {
+      error = true;
+    }
+
+    int row_count = 0;
+    if (client_num == 0) {
+      CDS.client1_map[row_sent] = row_data;
+    } else if (client_num == 1) {
+      CDS.client2_map[row_sent] = row_data;
+    }
+    CDS.last_ping_clients[client_num] = System.currentTimeMillis();
+    if (!CDS.is_map_full(client_num)) {
+      ask_map(vars, request_IP);
     }
   }
 
@@ -69,13 +95,19 @@ public class Connection_Manager extends Thread {
     }
 
     int row_count = 0;
-    if (client_num == 0) {
-      while (!CDS.client1_map[row_count].equals("")) {
-        row_count++;
+    try {
+      if (client_num == 0) {
+        while (!CDS.client1_map[row_count].equals("")) {
+          row_count++;
+        }
+      } else if (client_num == 1) {
+        while (!CDS.client2_map[row_count].equals("")) {
+          row_count++;
+        }
       }
-    } else if (client_num == 1) {
-      while (!CDS.client2_map[row_count].equals("")) {
-        row_count++;
+    } catch (ArrayIndexOutOfBoundsException e) {
+      if (CDS.check_map_status()) {
+        CDS.setup_map();
       }
     }
 

@@ -19,6 +19,7 @@ public class Client_Run {
   private int id;
   private String name = "filippo";
   private UUID uuid;
+  public static String[] client_map = { "XXXX", "AAAA", "BBBB", "CCCC" };
 
   public Client_Run() {
     try {
@@ -30,17 +31,16 @@ public class Client_Run {
       if (status < 1) {
         request_to_connect();
         response_to_connect();
-
-        send_ping();
-        receive_ping();
+        if (status == 1) {
+          send_ping();
+          receive_ping();
+        }
       } else if (status == 3) {
         wait_play_command();
-        send_ping();
-        receive_ping();
       } else {
-        wait_idle_command();
         send_ping();
         receive_ping();
+        wait_idle_command();
       }
     }
   }
@@ -57,9 +57,8 @@ public class Client_Run {
       case "error":
         System.out.println(variables.get("message"));
         break;
-      case "playstart":
-        check_play_status(variables);
-        System.out.println("yay");
+      case "mapreq":
+        send_map_response(variables);
         break;
       default:
         System.out.println("bad request");
@@ -69,6 +68,18 @@ public class Client_Run {
       System.out.println("didn't receive anything in the wait");
     } catch (IOException e) {
       e.printStackTrace();
+    }
+  }
+
+  private void send_map_response(Map variables) {
+    if (((String) variables.get("UUID")).equals(uuid.toString())) {
+      int which_row = Integer.parseInt((String) variables.get("row"));
+      String[] keys = { "UUID", "row", "data" };
+      String[] values = { uuid.toString(), which_row + "", client_map[which_row] };
+      byte[] map_response_byte = create_packet_string("mapakk", keys, values);
+      send_packets(map_response_byte);
+    } else {
+      System.out.println("Someone strange is trying to connect");
     }
   }
 
@@ -86,7 +97,6 @@ public class Client_Run {
         break;
       case "playstart":
         check_play_status(variables);
-        System.out.println("yay");
         break;
       default:
         System.out.println("bad request");
@@ -103,6 +113,7 @@ public class Client_Run {
     byte[] receiveData = new byte[512];
     DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
     try {
+      client_socket.setSoTimeout(5000);
       client_socket.receive(receive_packet);
       String command_type = command_parse(receive_packet);
       Map variables = parse_request_map(receive_packet);
@@ -152,12 +163,15 @@ public class Client_Run {
   }
 
   private void check_play_status(Map variables) {
-    if (UUID.fromString((String) variables.get("UUID")) == uuid) {
+    System.out.println((String) variables.get("UUID"));
+    System.out.println(uuid.toString());
+    if (((String) variables.get("UUID")).equals(uuid.toString())) {
       status = Integer.parseInt((String) variables.get("status"));
       String[] keys = { "UUID", "status" };
       String[] values = { uuid.toString(), Integer.toString(status) };
       byte[] send_play_akk = create_packet_string("playakk", keys, values);
       send_packets(send_play_akk);
+      status = 3;
       // start map making and the AI
     } else {
       System.out.println("someone strange wants to connect to you");
@@ -192,19 +206,24 @@ public class Client_Run {
       for (int j = 0; j < keys.length; j++) {
         packet_string += keys[j] + "=" + values[j] + ":";
       }
-      // System.out.println(packet_string);
+      System.out.println(packet_string);
 
       return packet_string.getBytes();
     }
   }
 
   private void send_ping() {
-    String command_word = "ping";
-    String[] keys = { "UUID", "status" };
-    String[] values = { uuid.toString(), Integer.toString(status) };
-    byte[] send_ping_data = create_packet_string(command_word, keys, values);
-    send_packets(send_ping_data);
-    System.out.println("sent ping");
+    try {
+      String command_word = "ping";
+      String[] keys = { "UUID", "status" };
+      String[] values = { uuid.toString(), Integer.toString(status) };
+      byte[] send_ping_data = create_packet_string(command_word, keys, values);
+      send_packets(send_ping_data);
+      System.out.println("sent ping");
+    } catch (NullPointerException e) {
+      System.out.println("bad ping");
+    }
+
   }
 
   private void receive_ping() {
