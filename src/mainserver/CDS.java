@@ -10,6 +10,9 @@ public class CDS {
   public static String[] client2_map = { "", "", "", "" };
   public static char[][] map;
   public static char[][] map_secret;
+  
+  public static int[] curr_x; //[0] - client1 || [1] - client2
+  public static int[] curr_y;
 
   // ************************************************
 
@@ -151,15 +154,52 @@ public class CDS {
   }
 
   public static int check_move(int client_num, int x_new_pos, int y_new_pos) {
-    // what needs to be done
-    // select which client
-    // look if the client moved
-    // look if the movement is valid (1 position changed)
-    // figure out which int
-
-    // win condition
-    // client 1 finds client 1 treasure and arrives at client 2 castle
-
-    // failure if movement is wrong client loses
+	  int status = -1; 
+	  if((x_new_pos >= 8 || x_new_pos < 0) || (y_new_pos >=8 || y_new_pos < 0)) {
+		  status=-1;
+	  } //if the player goes overboard, we return failure state (-1)
+	
+	  if(client_num ==0 )
+	  switch(map_secret[x_new_pos][y_new_pos])
+	{
+	 case 'G':
+		 status = 2; //  is for valid movement
+		 break;
+	 case 'W':
+		 status = -1; //  is for you lose
+		 break;
+	 case 'M':
+		 status = 2;// valid but have to wait a turn, this should be implemented on the client side
+		 break;
+	 case '2':
+		 status = 1; //found the castle, you win
+		 break;
+	 case '8':
+		 status = 0; // found the treasure, valid movement
+		 break; 		 
+	}
+	  
+	  if(client_num ==1 )
+	  switch(map_secret[x_new_pos][y_new_pos])
+	{
+	 case 'G':
+		 status = 2; //  is for valid movement
+		 break;
+	 case 'W':
+		 status = -1; //  is for you lose
+		 break;
+	 case 'M':
+		 status = 2;// valid but have to wait a turn, this should be implemented on the client side
+		 break;
+	 case '1':
+		 status = 1; //found the castle, you win
+		 break;
+	 case '7':
+		 status = 0; // found the treasure, valid movement
+		 break; 		 
+	}
+	 return status;
+    
   }
+ 
 }
