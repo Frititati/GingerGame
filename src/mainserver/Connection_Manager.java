@@ -21,6 +21,7 @@ public class Connection_Manager extends Thread {
 
   public void run() {
     try {
+      // setup socket
       server_socket = new DatagramSocket(9876);
       byte[] receiveData = new byte[512];
       while (true) {
@@ -29,10 +30,9 @@ public class Connection_Manager extends Thread {
         server_socket.receive(receive_packet);
         InetAddress request_IP = receive_packet.getAddress();
         // block : as inputs
-        // String[] variables_dirty = new
-        // String(receive_packet.getData()).split(":");
         Map map_vars = parse_request_map(receive_packet);
         String command_type = command_parse(receive_packet);
+        // filters command type
         switch (command_type) {
         case "connect":
           connection_request(map_vars, request_IP);
@@ -50,7 +50,7 @@ public class Connection_Manager extends Thread {
           check_movement_validity(map_vars, request_IP);
           break;
         default:
-          System.out.println("filtered wrong request");
+          Log.log(1, "Incorrect command word sent");
         }
       }
     } catch (Exception e) {
@@ -59,6 +59,7 @@ public class Connection_Manager extends Thread {
   }
 
   private void check_movement_validity(Map vars, InetAddress request_IP) {
+    // select which client we are connected to
     UUID UUID_temp = UUID.fromString((String) vars.get("UUID"));
     int y = Integer.parseInt((String) vars.get("ypos"));
     int x = Integer.parseInt((String) vars.get("xpos"));
@@ -71,6 +72,8 @@ public class Connection_Manager extends Thread {
     } else {
       error = true;
     }
+
+    // looks if the move is valid
     int validity_retval = CDS.check_move(client_num, x, y);
     int other_client = -1;
     if (client_turn == 0) {
@@ -78,6 +81,8 @@ public class Connection_Manager extends Thread {
     } else {
       other_client = 0;
     }
+
+    // filters conditions from check move
     switch (validity_retval) {
     case -1:
       send_game_end(client_turn, other_client);
@@ -94,11 +99,13 @@ public class Connection_Manager extends Thread {
   }
 
   private void send_movement(int x, int y) {
+    // sends client movements to both clients
     String[] keys = { "id", "xpos", "ypos" };
     String[] values = { client_turn + "", x + "", y + "" };
     byte[] send_movement_byte = create_packet_bytes("movebroad", keys, values);
     send_packets(send_movement_byte, clients_IPs[0]);
     send_packets(send_movement_byte, clients_IPs[1]);
+    // changes which client turn is
     if (client_turn == 0) {
       client_turn = 1;
     } else {
@@ -108,6 +115,8 @@ public class Connection_Manager extends Thread {
   }
 
   private void send_treasure() {
+    // sends another package if the client playing the last turn finds a
+    // treasure
     String[] keys = { "id" };
     String[] values = { client_turn + "" };
     byte[] send_treasure_byte = create_packet_bytes("treasure", keys, values);
@@ -115,6 +124,7 @@ public class Connection_Manager extends Thread {
   }
 
   private void send_game_end(int winner, int loser) {
+    // send which client lost and which client won to both clients
     String[] keys = { "winner", "loser", "status" };
     String[] values = { winner + "", loser + "", "2" };
     byte[] send_end_byte = create_packet_bytes("endgame", keys, values);
@@ -125,6 +135,7 @@ public class Connection_Manager extends Thread {
   }
 
   private void add_map(Map vars, InetAddress request_IP) {
+    // selects which client to connect to
     UUID UUID_temp = UUID.fromString((String) vars.get("UUID"));
     int row_sent = Integer.parseInt((String) vars.get("row"));
     String row_data = (String) vars.get("data");
@@ -151,6 +162,7 @@ public class Connection_Manager extends Thread {
   }
 
   private void ask_map(Map vars, InetAddress request_IP) {
+    // selects which client we are connected to
     UUID UUID_temp = UUID.fromString((String) vars.get("UUID"));
     int client_num = -1;
     boolean error = false;
@@ -163,6 +175,7 @@ public class Connection_Manager extends Thread {
     }
 
     int row_count = 0;
+    // looks for the missing rows
     try {
       if (client_num == 0) {
         while (!CDS.client1_map[row_count].equals("")) {
@@ -174,12 +187,13 @@ public class Connection_Manager extends Thread {
         }
       }
     } catch (ArrayIndexOutOfBoundsException e) {
+      // if both clients sent both maps it starts the game
       if (CDS.check_sent_map_status()) {
         CDS.setup_map();
         send_maps();
         CDS.clients_status[0] = 3;
         CDS.clients_status[1] = 3;
-        turn_ask();
+        turn_ask(); // asks for client 1 to start
       }
     }
 
@@ -194,6 +208,7 @@ public class Connection_Manager extends Thread {
   }
 
   private void send_maps() {
+    // sends the full map to both clients
     String[] keys = { "map" };
     String[] values = { CDS.merge_sent_maps() };
     byte[] send_map_byte = create_packet_bytes("fullmap", keys, values);
@@ -219,6 +234,8 @@ public class Connection_Manager extends Thread {
       } else {
         client_num = 1;
       }
+
+      // creates user data
       UUID new_client_UUID = UUID.randomUUID();
       clients_UUID[client_num] = new_client_UUID;
       CDS.connected_clients_names[client_num] = client_name;
@@ -247,6 +264,7 @@ public class Connection_Manager extends Thread {
   }
 
   private Map<String, String> parse_request_map(DatagramPacket incoming) {
+    // creates a Map for the key:value combinations incoming from client
     // block : as inputs
     String[] vars_dirty = new String(incoming.getData()).split(":");
     // String[] vars = Arrays.copyOfRange(vars_dirty, 1, vars_dirty.length);
@@ -261,6 +279,7 @@ public class Connection_Manager extends Thread {
   }
 
   private void ping_check(Map vars, InetAddress client_ip) {
+    // selects which client we are receiving communications from
     UUID UUID_temp = UUID.fromString((String) vars.get("UUID"));
     int client_num = -1;
     boolean error = false;
@@ -271,6 +290,7 @@ public class Connection_Manager extends Thread {
     } else {
       error = true;
     }
+    // /////
 
     if (!error) {
       if (CDS.clients_status[client_num] == Integer.parseInt((String) vars.get("status"))) {
@@ -284,6 +304,7 @@ public class Connection_Manager extends Thread {
     } else {
       send_error(client_num, "The ping request UUID is wrong");
     }
+    // updates the ping count down
     CDS.last_ping_clients[client_num] = System.currentTimeMillis();
   }
 
@@ -308,17 +329,17 @@ public class Connection_Manager extends Thread {
       System.out.println("The the command: " + command_word + " the keys and values don't match");
       throw new ArrayIndexOutOfBoundsException();
     } else {
-      String packet_string = command_word + ":";
+      String packet_string = command_word + ":"; // everything is separated by :
       for (int j = 0; j < keys.length; j++) {
-        packet_string += keys[j] + "=" + values[j] + ":";
+        packet_string += keys[j] + "=" + values[j] + ":"; // key:value
+                                                          // combination
       }
-      // System.out.println(packet_string);
-
-      return packet_string.getBytes();
+      return packet_string.getBytes(); // creates byte[]
     }
   }
 
   public String command_parse(DatagramPacket incoming) {
+    // selects the command word from the incoming string message
     String[] vars_dirty = new String(incoming.getData()).split(":");
     return vars_dirty[0];
   }
@@ -328,12 +349,14 @@ public class Connection_Manager extends Thread {
     String[] values = { clients_UUID[0].toString(), "3" };
     byte[] packets_start = create_packet_bytes("playstart", keys, values);
     send_packets(packets_start, clients_IPs[0]);
+    CDS.clients_status[0] = 3;
     Log.log(1, "Sent packets to start the game");
     // for (int i = 0; i < 2; i++) {
     // String[] keys = { "UUID", "status" };
     // String[] values = { clients_UUID[i].toString(), "3" };
     // byte[] packets_start = create_packet_bytes("playstart", keys, values);
     // send_packets(packets_start, clients_IPs[i]);
+    // CDS.clients_status[i] = 3;
     // Log.log(1, "Sent packets to start the game");
     // }
   }
