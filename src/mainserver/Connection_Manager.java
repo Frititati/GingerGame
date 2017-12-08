@@ -106,7 +106,7 @@ public class Connection_Manager extends Thread {
         }
       }
     } catch (ArrayIndexOutOfBoundsException e) {
-      if (CDS.check_map_status()) {
+      if (CDS.check_sent_map_status()) {
         CDS.setup_map();
       }
     }

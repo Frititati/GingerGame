@@ -8,6 +8,79 @@ public class CDS {
   public static long[] last_ping_clients = { 0, 0 };
   public static String[] client1_map = { "", "", "", "" };
   public static String[] client2_map = { "", "", "", "" };
+  public static char[][] map;
+  public static char[][] map_secret;
+
+  public static int[] random_different_numbers(int range) {
+    int rand1 = 0;
+    int rand2 = 0;
+    while (rand1 == rand2) {
+      rand1 = (int) (Math.random() * range);
+      rand2 = (int) (Math.random() * range);
+    }
+    int[] retval = { rand1, rand2 };
+    return retval;
+  }
+
+  public static String merge_sent_maps_secret() {
+    String client1_str = client1_map[0] + client1_map[1] + client1_map[2] + client1_map[3];
+    client1_str = reverse_string(client1_str);
+    int med_count1 = 0;
+    for (int i = 0; i < client1_str.length(); i++) {
+      if (client1_str.charAt(i) == 'G') {
+        med_count1++;
+      }
+    }
+    int[] randoms = random_different_numbers(med_count1);
+    int pass_count = 0;
+    String secret_map = "";
+    for (int i = 0; i < client1_str.length(); i++) {
+      if (client1_str.charAt(i) == 'G' && pass_count == randoms[0]) {
+        secret_map += "1";
+        pass_count++;
+      } else if (client1_str.charAt(i) == 'G' && pass_count == randoms[1]) {
+        secret_map += "7";
+        pass_count++;
+      } else {
+        secret_map += client1_str.charAt(i);
+        pass_count++;
+      }
+    }
+
+    String client2_str = client2_map[0] + client2_map[1] + client2_map[2] + client2_map[3];
+    int med_count2 = 0;
+    for (int i = 0; i < client2_str.length(); i++) {
+      if (client2_str.charAt(i) == 'G') {
+        med_count2++;
+      }
+    }
+    randoms = random_different_numbers(med_count2);
+    pass_count = 0;
+    for (int i = 0; i < client2_str.length(); i++) {
+      if (client2_str.charAt(i) == 'G' && pass_count == randoms[0]) {
+        secret_map += "2";
+        pass_count++;
+      } else if (client2_str.charAt(i) == 'G' && pass_count == randoms[1]) {
+        secret_map += "8";
+        pass_count++;
+      } else {
+        secret_map += client2_str.charAt(i);
+        pass_count++;
+      }
+    }
+    return secret_map;
+  }
+
+  public static String merge_sent_maps() {
+    String client1_str = client1_map[0] + client1_map[1] + client1_map[2] + client1_map[3];
+    client1_str = reverse_string(client1_str);
+    String client2_str = client2_map[0] + client2_map[1] + client2_map[2] + client2_map[3];
+    return client1_str + client2_str;
+  }
+
+  public static String reverse_string(String input) {
+    return new StringBuilder(input).reverse().toString();
+  }
 
   public static boolean is_map_full(int client_num) {
     if (client_num == 0) {
@@ -26,7 +99,7 @@ public class CDS {
     return true;
   }
 
-  public static boolean check_map_status() {
+  public static boolean check_sent_map_status() {
     boolean client1 = false;
     try {
       int row_count = 0;

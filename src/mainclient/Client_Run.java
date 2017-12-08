@@ -32,20 +32,20 @@ public class Client_Run {
         request_to_connect();
         response_to_connect();
         if (status == 1) {
-          send_ping();
-          receive_ping();
+          ping_send();
+          ping_receive();
         }
       } else if (status == 3) {
-        wait_play_command();
+        wait_command_play();
       } else {
-        send_ping();
-        receive_ping();
-        wait_idle_command();
+        ping_send();
+        ping_receive();
+        wait_command_idle();
       }
     }
   }
 
-  private void wait_play_command() {
+  private void wait_command_play() {
     byte[] receiveData = new byte[512];
     DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
     try {
@@ -83,7 +83,7 @@ public class Client_Run {
     }
   }
 
-  private void wait_idle_command() {
+  private void wait_command_idle() {
     byte[] receiveData = new byte[512];
     DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
     try {
@@ -163,8 +163,6 @@ public class Client_Run {
   }
 
   private void check_play_status(Map variables) {
-    System.out.println((String) variables.get("UUID"));
-    System.out.println(uuid.toString());
     if (((String) variables.get("UUID")).equals(uuid.toString())) {
       status = Integer.parseInt((String) variables.get("status"));
       String[] keys = { "UUID", "status" };
@@ -212,7 +210,7 @@ public class Client_Run {
     }
   }
 
-  private void send_ping() {
+  private void ping_send() {
     try {
       String command_word = "ping";
       String[] keys = { "UUID", "status" };
@@ -226,7 +224,7 @@ public class Client_Run {
 
   }
 
-  private void receive_ping() {
+  private void ping_receive() {
     byte[] receiveData = new byte[512];
     DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
     try {
