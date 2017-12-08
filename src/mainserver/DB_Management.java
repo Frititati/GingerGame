@@ -2,6 +2,7 @@ package mainserver;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class DB_Management {
+  private PreparedStatement prepared_sql;
   private String db_host = Property_File.get_property("db_host");
   private String db_port = Property_File.get_property("db_port");
   private String db_name = Property_File.get_property("db_name");
@@ -27,14 +29,20 @@ public class DB_Management {
       System.exit(20);
     }
     System.out.println("Opened database successfully");
+    Log.log(1, "Database succesfully connected");
   }
   
   public boolean insert_score(String player_0, String player_1, int score_0, int score_1){
 	Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 	try {
-	  Statement db_statement = db_connection.createStatement();
+	  //Statement db_statement = db_connection.createStatement();
 	  String sql = "INSERT INTO match_history(player_0, player_1, score_0, score_1, timestamp) VALUES ("+player_0+", "+player_1+","+score_0+","+score_1+","+timestamp+")";
-	  db_statement.executeUpdate(sql);
+	  Log.log(0, "timestamp is: " + timestamp);
+	  prepared_sql = db_connection.prepareStatement(sql);
+	  //db_statement.executeUpdate(sql);
+	  prepared_sql.executeUpdate();
+	  db_connection.commit();
+	  
 	} catch (SQLException e) {
 	  Log.log(0, "Insert query to database "+db_name+" on "+db_host+" on port "+db_port+" failed."
 	  		+ "\nVar dump:"

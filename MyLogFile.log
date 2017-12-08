@@ -1,17 +1,3 @@
-Dec 03, 2017 5:48:47 PM mainserver.Log log
-WARNING: client named: filippo has connected
-Dec 03, 2017 5:50:41 PM mainserver.Log log
-WARNING: client named: filippo has connected
-Dec 03, 2017 6:39:21 PM mainserver.Log log
-INFO: client named: filippo has connected
-Dec 03, 2017 6:39:24 PM mainserver.Log log
-SEVERE: There aren't 2 connected users
-Dec 03, 2017 6:39:26 PM mainserver.Log log
-SEVERE: There aren't 2 connected users
-Dec 03, 2017 6:39:32 PM mainserver.Log log
-SEVERE: There aren't 2 connected users
-Dec 04, 2017 9:29:54 PM mainserver.Log log
-INFO: client named: filippo has connected
 Dec 04, 2017 9:30:09 PM mainserver.Log log
 INFO: Sent packets to start the game
 Dec 04, 2017 10:02:52 PM mainserver.Log log
@@ -21,20 +7,6 @@ INFO: client named: filippo has connected
 Dec 04, 2017 10:16:23 PM mainserver.Log log
 INFO: client named: filippo has connected
 Dec 04, 2017 10:17:18 PM mainserver.Log log
-INFO: client named: filippo has connected
-Dec 05, 2017 5:52:04 PM mainserver.Log log
-INFO: client named: filippo has connected
-Dec 05, 2017 5:52:09 PM mainserver.Log log
-INFO: Sent packets to start the game
-Dec 05, 2017 5:53:03 PM mainserver.Log log
-INFO: client named: filippo has connected
-Dec 05, 2017 5:53:06 PM mainserver.Log log
-INFO: Sent packets to start the game
-Dec 05, 2017 5:53:35 PM mainserver.Log log
-INFO: client named: filippo has connected
-Dec 05, 2017 5:53:48 PM mainserver.Log log
-INFO: Sent packets to start the game
-Dec 05, 2017 5:55:02 PM mainserver.Log log
 INFO: client named: filippo has connected
 Dec 05, 2017 5:55:05 PM mainserver.Log log
 INFO: Sent packets to start the game
@@ -51,20 +23,6 @@ INFO: client named: filippo has connected
 Dec 05, 2017 7:35:31 PM mainserver.Log log
 INFO: client named: filippo has connected
 Dec 05, 2017 7:35:34 PM mainserver.Log log
-INFO: Sent packets to start the game
-Dec 05, 2017 7:36:25 PM mainserver.Log log
-INFO: client named: filippo has connected
-Dec 05, 2017 7:36:26 PM mainserver.Log log
-INFO: Sent packets to start the game
-Dec 05, 2017 11:34:18 PM mainserver.Log log
-INFO: client named: filippo has connected
-Dec 05, 2017 11:34:22 PM mainserver.Log log
-INFO: Sent packets to start the game
-Dec 05, 2017 11:35:15 PM mainserver.Log log
-INFO: client named: filippo has connected
-Dec 05, 2017 11:35:18 PM mainserver.Log log
-INFO: Sent packets to start the game
-Dec 05, 2017 11:35:29 PM mainserver.Log log
 INFO: Sent packets to start the game
 Dec 05, 2017 11:38:05 PM mainserver.Log log
 INFO: client named: filippo has connected
@@ -88,3 +46,155 @@ Dec 07, 2017 4:49:21 PM mainserver.Log log
 INFO: Sent packets to start the game
 Dec 07, 2017 4:50:32 PM mainserver.Log log
 INFO: client named: filippo has connected
+Dec 08, 2017 5:57:04 PM mainserver.Log log
+SEVERE: Config file missing or unreadable! Abort
+Dec 08, 2017 6:26:57 PM mainserver.Log log
+SEVERE: Config file missing or unreadable! Abort
+Dec 08, 2017 6:27:10 PM mainserver.Log log
+SEVERE: Config file missing or unreadable! Abort
+Dec 08, 2017 6:47:00 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 6:47:50 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 6:47:55 PM mainserver.Log log
+INFO: client named: filippo has connected
+Dec 08, 2017 7:04:06 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 7:04:11 PM mainserver.Log log
+INFO: client named: filippo has connected
+Dec 08, 2017 7:07:36 PM mainserver.Log log
+INFO: Sent packets to start the game
+Dec 08, 2017 7:07:36 PM mainserver.Log log
+INFO: The map for client 0is not full.
+Dec 08, 2017 7:07:36 PM mainserver.Log log
+INFO: The map for client 0is not full.
+Dec 08, 2017 7:07:36 PM mainserver.Log log
+INFO: The map for client 0is not full.
+Dec 08, 2017 7:08:45 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 7:09:53 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 7:09:58 PM mainserver.Log log
+INFO: client named: filippo has connected
+Dec 08, 2017 7:10:01 PM mainserver.Log log
+INFO: Sent packets to start the game
+Dec 08, 2017 7:10:01 PM mainserver.Log log
+INFO: The map for client 0 is not full.
+Dec 08, 2017 7:10:01 PM mainserver.Log log
+SEVERE: Insert query to database gingerdb on localhost on port 5432 failed.
+Var dump:
+player_0: filippo
+player_1: null
+score_0: 0
+score_1: 1
+timestamp: 1512756601130 (parsed: 2017-12-08 19:10:01.13)
+Dec 08, 2017 7:10:01 PM mainserver.Log log
+INFO: The map for client 0 is not full.
+Dec 08, 2017 7:10:01 PM mainserver.Log log
+SEVERE: Insert query to database gingerdb on localhost on port 5432 failed.
+Var dump:
+player_0: filippo
+player_1: null
+score_0: 0
+score_1: 1
+timestamp: 1512756601161 (parsed: 2017-12-08 19:10:01.161)
+Dec 08, 2017 7:10:01 PM mainserver.Log log
+INFO: The map for client 0 is not full.
+Dec 08, 2017 7:10:01 PM mainserver.Log log
+SEVERE: Insert query to database gingerdb on localhost on port 5432 failed.
+Var dump:
+player_0: filippo
+player_1: null
+score_0: 0
+score_1: 1
+timestamp: 1512756601176 (parsed: 2017-12-08 19:10:01.176)
+Dec 08, 2017 7:10:21 PM mainserver.Log log
+INFO: Sent packets to start the game
+Dec 08, 2017 7:13:26 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 7:14:02 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 7:14:22 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 7:14:31 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 7:16:50 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 7:16:57 PM mainserver.Log log
+INFO: client named: filippo has connected
+Dec 08, 2017 7:17:00 PM mainserver.Log log
+INFO: Sent packets to start the game
+Dec 08, 2017 7:17:00 PM mainserver.Log log
+INFO: The map for client 0 is not full.
+Dec 08, 2017 7:17:00 PM mainserver.Log log
+SEVERE: timestamp is: 2017-12-08 19:17:00.479
+Dec 08, 2017 7:17:00 PM mainserver.Log log
+SEVERE: Insert query to database gingerdb on localhost on port 5432 failed.
+Var dump:
+player_0: filippo
+player_1: null
+score_0: 0
+score_1: 1
+timestamp: 1512757020479 (parsed: 2017-12-08 19:17:00.479)
+Dec 08, 2017 7:17:00 PM mainserver.Log log
+INFO: The map for client 0 is not full.
+Dec 08, 2017 7:17:00 PM mainserver.Log log
+SEVERE: timestamp is: 2017-12-08 19:17:00.516
+Dec 08, 2017 7:17:00 PM mainserver.Log log
+SEVERE: Insert query to database gingerdb on localhost on port 5432 failed.
+Var dump:
+player_0: filippo
+player_1: null
+score_0: 0
+score_1: 1
+timestamp: 1512757020516 (parsed: 2017-12-08 19:17:00.516)
+Dec 08, 2017 7:17:00 PM mainserver.Log log
+INFO: The map for client 0 is not full.
+Dec 08, 2017 7:17:00 PM mainserver.Log log
+SEVERE: timestamp is: 2017-12-08 19:17:00.535
+Dec 08, 2017 7:17:00 PM mainserver.Log log
+SEVERE: Insert query to database gingerdb on localhost on port 5432 failed.
+Var dump:
+player_0: filippo
+player_1: null
+score_0: 0
+score_1: 1
+timestamp: 1512757020535 (parsed: 2017-12-08 19:17:00.535)
+Dec 08, 2017 7:20:01 PM mainserver.Log log
+INFO: Sent packets to start the game
+Dec 08, 2017 7:20:21 PM mainserver.Log log
+INFO: Sent packets to start the game
+Dec 08, 2017 7:22:41 PM mainserver.Log log
+INFO: Sent packets to start the game
+Dec 08, 2017 7:22:56 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 7:23:14 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 8:43:34 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 8:43:56 PM mainserver.Log log
+INFO: client named: filippo has connected
+Dec 08, 2017 9:52:08 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 9:52:08 PM mainserver.Log log
+SEVERE: timestamp is: 2017-12-08 21:52:08.199
+Dec 08, 2017 9:52:08 PM mainserver.Log log
+SEVERE: Insert query to database gingerdb on localhost on port 5432 failed.
+Var dump:
+player_0: null
+player_1: null
+score_0: 1
+score_1: 0
+timestamp: 1512766328199 (parsed: 2017-12-08 21:52:08.199)
+Dec 08, 2017 9:53:42 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 9:53:42 PM mainserver.Log log
+SEVERE: timestamp is: 2017-12-08 21:53:42.723
+Dec 08, 2017 9:53:42 PM mainserver.Log log
+SEVERE: Insert query to database gingerdb on localhost on port 5432 failed.
+Var dump:
+player_0: null
+player_1: null
+score_0: 1
+score_1: 0
+timestamp: 1512766422723 (parsed: 2017-12-08 21:53:42.723)

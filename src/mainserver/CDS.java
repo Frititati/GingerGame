@@ -10,7 +10,7 @@ public class CDS {
   public static String[] client2_map = { "", "", "", "" };
   public static char[][] map;
   public static char[][] map_secret;
-  
+  public static DB_Management dbCon = new DB_Management(); 
   public static int[] curr_x; //[0] - client1 || [1] - client2
   public static int[] curr_y;
 
@@ -73,6 +73,7 @@ public class CDS {
         pass_count++;
       }
     }
+    Log.log(1, "Map succesfully merged");
     return secret_map;
   }
 
@@ -91,12 +92,15 @@ public class CDS {
     if (client_num == 0) {
       for (int i = 0; i < client1_map.length; i++) {
         if (client1_map[i].equals("")) {
+        	Log.log(1,"The map for client " + client_num + " is not full.");
+        	updateDbScore(0);
           return false;
         }
       }
     } else if (client_num == 1) {
       for (int i = 0; i < client2_map.length; i++) {
         if (client2_map[i].equals("")) {
+        	Log.log(1,"The map for client " + client_num + " is not full.");
           return false;
         }
       }
@@ -113,6 +117,7 @@ public class CDS {
       }
     } catch (ArrayIndexOutOfBoundsException e) {
       client1 = true;
+      Log.log(1,"The map for client1 is complete.");
       System.out.println("yay we be good");
     }
     boolean client2 = false;
@@ -122,6 +127,7 @@ public class CDS {
         row_count++;
       }
     } catch (ArrayIndexOutOfBoundsException e) {
+    	Log.log(1,"The map for client2 is completed.");
       client2 = true;
     }
 
@@ -141,7 +147,7 @@ public class CDS {
         count++;
       }
     }
-
+    Log.log(1, "map transformed into char double array");
     // transform map_secret_str to map_secret char
     map_secret = new char[8][8];
     count = 0;
@@ -151,11 +157,21 @@ public class CDS {
         count++;
       }
     }
+    Log.log(1, "map transformed into char double array");
   }
 
+  
+  private static void updateDbScore(int loser_client) {
+	  if(loser_client==0)
+		  dbCon.insert_score(connected_clients_names[0], connected_clients_names[1], 0, 1);
+	  if(loser_client==1)
+		  dbCon.insert_score(connected_clients_names[0], connected_clients_names[1], 1, 0);
+  }
+  
   public static int check_move(int client_num, int x_new_pos, int y_new_pos) {
 	  int status = -1; 
 	  if((x_new_pos >= 8 || x_new_pos < 0) || (y_new_pos >=8 || y_new_pos < 0)) {
+		  updateDbScore(client_num);
 		  status=-1;
 	  } //if the player goes overboard, we return failure state (-1)
 	
@@ -167,19 +183,21 @@ public class CDS {
 		 break;
 	 case 'W':
 		 status = -1; //  is for you lose
+		 updateDbScore(0);
 		 break;
 	 case 'M':
 		 status = 2;// valid but have to wait a turn, this should be implemented on the client side
 		 break;
 	 case '2':
 		 status = 1; //found the castle, you win
+		 updateDbScore(1);
 		 break;
 	 case '8':
 		 status = 0; // found the treasure, valid movement
 		 break; 		 
 	}
 	  
-	  if(client_num ==1 )
+	  if(client_num == 1)
 	  switch(map_secret[x_new_pos][y_new_pos])
 	{
 	 case 'G':
@@ -187,12 +205,14 @@ public class CDS {
 		 break;
 	 case 'W':
 		 status = -1; //  is for you lose
+		 updateDbScore(1);
 		 break;
 	 case 'M':
 		 status = 2;// valid but have to wait a turn, this should be implemented on the client side
 		 break;
 	 case '1':
 		 status = 1; //found the castle, you win
+		 updateDbScore(0);
 		 break;
 	 case '7':
 		 status = 0; // found the treasure, valid movement

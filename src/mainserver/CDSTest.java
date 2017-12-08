@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 class CDSTest {
 
 	@Test
-	void testRandom_different_numbers() {
-		
+	void testRandom_different_numbers() {		
 		assertTrue(CDS.random_different_numbers(4)[0] <= 3 
 				&& CDS.random_different_numbers(4)[1] >=0);
 	}
