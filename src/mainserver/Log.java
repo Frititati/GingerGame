@@ -19,12 +19,12 @@ public class Log {
       SimpleFormatter formatter = new SimpleFormatter();
       fh.setFormatter(formatter);
 
-      // the following statement is used to log any messages
+      // the following statement is used to log messages together with their level
       if (status == 0) {
         logger.severe(msg);
       } else if (status == 2) {
         logger.warning(msg);
-      } else {
+      } else if (status == 1){
         logger.info(msg);
       }
     } catch (SecurityException e) {
