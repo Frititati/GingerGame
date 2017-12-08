@@ -11,6 +11,8 @@ public class CDS {
   public static char[][] map;
   public static char[][] map_secret;
 
+  // ************************************************
+
   public static int[] random_different_numbers(int range) {
     int rand1 = 0;
     int rand2 = 0;
@@ -36,10 +38,10 @@ public class CDS {
     String secret_map = "";
     for (int i = 0; i < client1_str.length(); i++) {
       if (client1_str.charAt(i) == 'G' && pass_count == randoms[0]) {
-        secret_map += "1";
+        secret_map += "1"; // client 1 castle
         pass_count++;
       } else if (client1_str.charAt(i) == 'G' && pass_count == randoms[1]) {
-        secret_map += "7";
+        secret_map += "7"; // client 1 treasure
         pass_count++;
       } else {
         secret_map += client1_str.charAt(i);
@@ -58,10 +60,10 @@ public class CDS {
     pass_count = 0;
     for (int i = 0; i < client2_str.length(); i++) {
       if (client2_str.charAt(i) == 'G' && pass_count == randoms[0]) {
-        secret_map += "2";
+        secret_map += "2";// client 2 castle
         pass_count++;
       } else if (client2_str.charAt(i) == 'G' && pass_count == randoms[1]) {
-        secret_map += "8";
+        secret_map += "8";// client 2 treasure
         pass_count++;
       } else {
         secret_map += client2_str.charAt(i);
@@ -124,6 +126,40 @@ public class CDS {
   }
 
   public static void setup_map() {
+    String map_str = merge_sent_maps();
+    String map_secret_str = merge_sent_maps_secret();
 
+    // transform map_str to map char
+    map = new char[8][8];
+    int count = 0;
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        map[i][j] = map_str.charAt(count);
+        count++;
+      }
+    }
+
+    // transform map_secret_str to map_secret char
+    map_secret = new char[8][8];
+    count = 0;
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        map_secret[i][j] = map_secret_str.charAt(count);
+        count++;
+      }
+    }
+  }
+
+  public static int check_move(int client_num, int x_new_pos, int y_new_pos) {
+    // what needs to be done
+    // select which client
+    // look if the client moved
+    // look if the movement is valid (1 position changed)
+    // figure out which int
+
+    // win condition
+    // client 1 finds client 1 treasure and arrives at client 2 castle
+
+    // failure if movement is wrong client loses
   }
 }

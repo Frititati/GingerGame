@@ -47,6 +47,9 @@ public class Connection_Manager extends Thread {
         case "mapakk":
           add_map(map_vars, request_IP);
           break;
+        case "turnakk":
+
+          break;
         default:
           System.out.println("filtered wrong request");
         }
