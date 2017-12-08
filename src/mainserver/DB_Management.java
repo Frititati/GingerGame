@@ -32,6 +32,23 @@ public class DB_Management {
     Log.log(1, "Database succesfully connected");
   }
   
+  public boolean insert_clientname(String name){
+	try {
+	  //Statement db_statement = db_connection.createStatement();
+	  String sql = "INSERT INTO client_names(name) VALUES ("+name+")";
+ 
+	  prepared_sql = db_connection.prepareStatement(sql);
+	  prepared_sql.executeUpdate();
+	  db_connection.commit();
+	  
+	} catch (SQLException e) {
+		
+	  return false;
+	}
+	return true;
+  }
+  
+  
   public boolean insert_score(String player_0, String player_1, int score_0, int score_1){
 	Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 	try {
@@ -39,7 +56,6 @@ public class DB_Management {
 	  String sql = "INSERT INTO match_history(player_0, player_1, score_0, score_1, timestamp) VALUES ("+player_0+", "+player_1+","+score_0+","+score_1+","+timestamp+")";
 	  Log.log(0, "timestamp is: " + timestamp);
 	  prepared_sql = db_connection.prepareStatement(sql);
-	  //db_statement.executeUpdate(sql);
 	  prepared_sql.executeUpdate();
 	  db_connection.commit();
 	  
@@ -55,6 +71,28 @@ public class DB_Management {
 	}
 	return true;
   }
+   
+  //method insert the movement on each client for each turn
+  public boolean insert_action(int client_id, int pos_x, int pos_y, int turn){
+	try {
+	  //Statement db_statement = db_connection.createStatement();
+	  String sql = "INSERT INTO match_moves(client_id, pos_x, pos_y, turn) VALUES ("+client_id+", "+pos_x+","+pos_y+","+turn+")";
+	  prepared_sql = db_connection.prepareStatement(sql);
+	  prepared_sql.executeUpdate();
+	  db_connection.commit();
+	  
+	} catch (SQLException e) {
+	  Log.log(0, "Insert query to database "+db_name+" on "+db_host+" on port "+db_port+" failed."
+	  		+ "\nVar dump:"
+	  		+ "\nclient_id: "+ client_id
+	  		+ "\npos_x: "+ pos_x
+	  		+ "\npos_y: "+pos_y
+	  		+ "\nturn: "+turn);
+	  return false;
+	}
+	return true;
+  }
+  
   
   public ArrayList<DB_Result> read_scores(){
 	ArrayList<DB_Result> result = new ArrayList<DB_Result>();
@@ -71,7 +109,7 @@ public class DB_Management {
 	return result;
   }
   
-  public DB_Result get_high_score(){
+/*  public DB_Result get_high_score(){
 	DB_Result result = null;
 	try {
 	  Statement db_statement = db_connection.createStatement();
@@ -82,5 +120,5 @@ public class DB_Management {
 	  Log.log(0, "Reading high score from DB failed");
 	}
 	return result;
-  }
+  }*/
 }

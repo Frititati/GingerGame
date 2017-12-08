@@ -83,7 +83,7 @@ public class CDS {
     String client2_str = client2_map[0] + client2_map[1] + client2_map[2] + client2_map[3];
     return client1_str + client2_str;
   }
-
+  
   public static String reverse_string(String input) {
     return new StringBuilder(input).reverse().toString();
   }

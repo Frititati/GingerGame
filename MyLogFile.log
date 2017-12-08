@@ -198,3 +198,17 @@ player_1: null
 score_0: 1
 score_1: 0
 timestamp: 1512766422723 (parsed: 2017-12-08 21:53:42.723)
+Dec 08, 2017 11:14:39 PM mainserver.Log log
+INFO: Database succesfully connected
+Dec 08, 2017 11:14:39 PM mainserver.Log log
+SEVERE: timestamp is: 2017-12-08 23:14:39.183
+Dec 08, 2017 11:14:39 PM mainserver.Log log
+SEVERE: Insert query to database gingerdb on localhost on port 5432 failed.
+Var dump:
+player_0: null
+player_1: null
+score_0: 1
+score_1: 0
+timestamp: 1512771279183 (parsed: 2017-12-08 23:14:39.183)
+Dec 08, 2017 11:14:39 PM mainserver.Log log
+INFO: Map succesfully merged

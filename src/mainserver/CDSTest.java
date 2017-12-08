@@ -5,13 +5,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 class CDSTest {
-
+	
 	@Test
 	void testRandom_different_numbers() {		
 		assertTrue(CDS.random_different_numbers(4)[0] <= 3 
 				&& CDS.random_different_numbers(4)[1] >=0);
 	}
-
+	
 	@Test
 	void testIs_map_full() {
 	
@@ -40,5 +40,4 @@ class CDSTest {
 		
 		assertEquals( 1, CDS.check_move(0,0, 7));
 	}
-
 }
