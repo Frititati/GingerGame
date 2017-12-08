@@ -4,3 +4,5 @@
 MyLogFile.log
 config.properties
 MyLogFile.log.1
+MyLogFile.log.1
+*.2
