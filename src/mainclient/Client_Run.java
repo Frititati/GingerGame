@@ -7,9 +7,13 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Random;
+
+import sun.security.util.Length;
 
 public class Client_Run {
   private int status = 0;
@@ -17,9 +21,10 @@ public class Client_Run {
   private int server_port = 9876;
   private DatagramSocket client_socket;
   private int id;
-  private String name = "filippo";
+  private String name = "Test_Client";
   private UUID uuid;
-  public static String[] client_map = { "XXXX", "AAAA", "BBBB", "CCCC" };
+  public static String[] client_map;
+  public static boolean gen_map = false;
 
   public Client_Run() {
     try {
@@ -55,17 +60,21 @@ public class Client_Run {
       Map variables = parse_request_map(receive_packet);
       switch (command_type) {
       case "error":
-        System.out.println(variables.get("message"));
+        Log.log(0, "Received error from server: " + variables.get("message"));
         break;
       case "mapreq":
+        if (!gen_map) {
+          split_map();
+          gen_map = true;
+        }
         send_map_response(variables);
         break;
       default:
-        System.out.println("bad request");
+        Log.log(0, "Sent Request was malformed");
       }
     } catch (SocketTimeoutException e1) {
       // nothing happened
-      System.out.println("didn't receive anything in the wait");
+      Log.log(0, "Sent Request and didn't get any response while waiting to play");
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -79,31 +88,88 @@ public class Client_Run {
       byte[] map_response_byte = create_packet_string("mapakk", keys, values);
       send_packets(map_response_byte);
     } else {
-      System.out.println("Someone strange is trying to connect");
+      Log.log(0, "Server didn't send correct UUID, intruder in the system");
     }
+  }
+
+  // water w
+  // meddow g
+  // mountain m
+  private char random_char(ArrayList<Character> r) {
+    int list_len = r.size();
+    Random rand = new Random();
+    int rand_char = rand.nextInt(list_len);
+    return r.get(rand_char);
+  }
+
+  // water w
+  // meddow g
+  // mountain m
+  private String generate_map() {
+    String retval = "";
+    int available_w = 6;
+    int available_g = 6;
+    int available_m = 4;
+    ArrayList<Character> round_char = new ArrayList<Character>();
+    for (int i = 0; i < 16; i++) {
+      round_char = new ArrayList<Character>();
+      if (available_w != 0) {
+        round_char.add('w');
+      }
+      if (available_g != 0) {
+        round_char.add('g');
+      }
+      if (available_m != 0) {
+        round_char.add('m');
+      }
+      char char_selected = random_char(round_char);
+      retval += char_selected;
+      switch(char_selected) {
+      case 'w':
+    	  available_w--;
+    	  break;
+      case 'g':
+    	  available_g--;
+    	  break;
+      case 'm':
+    	  available_m--;
+      }
+    }
+    return retval;
+  }
+
+  private String[] split_map() {
+    String to_be_split = generate_map();
+    String[] map_split = new String[4];
+    map_split[0] = to_be_split.substring(0, 4);
+    map_split[1] = to_be_split.substring(3, 7);
+    map_split[2] = to_be_split.substring(7, 11);
+    map_split[3] = to_be_split.substring(11, 15);
+    client_map = map_split;
+    return client_map;
   }
 
   private void wait_command_idle() {
     byte[] receiveData = new byte[512];
     DatagramPacket receive_packet = new DatagramPacket(receiveData, receiveData.length);
     try {
-      client_socket.setSoTimeout(10000); // 30 seconds
+      client_socket.setSoTimeout(10000); // 10 seconds
       client_socket.receive(receive_packet);
       String command_type = command_parse(receive_packet);
       Map variables = parse_request_map(receive_packet);
       switch (command_type) {
       case "error":
-        System.out.println(variables.get("message"));
+        Log.log(0, "Received error from server: " + variables.get("message"));
         break;
       case "playstart":
         check_play_status(variables);
         break;
       default:
-        System.out.println("bad request");
+        Log.log(0, "Sent Request was malformed");
       }
     } catch (SocketTimeoutException e1) {
       // nothing happened
-      System.out.println("didn't receive anything in the wait");
+      Log.log(0, "Sent Request and didn't get any response while waiting");
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -119,7 +185,7 @@ public class Client_Run {
       Map variables = parse_request_map(receive_packet);
       switch (command_type) {
       case "error":
-        System.out.println(variables.get("message"));
+        Log.log(0, "Received error from server: " + variables.get("message"));
         break;
       case "accept":
         if (((String) variables.get("name")).equals(name)) {
@@ -127,14 +193,14 @@ public class Client_Run {
           uuid = UUID.fromString((String) variables.get("UUID"));
           status = Integer.parseInt((String) variables.get("status"));
         } else {
-          System.out.println("Wrong username back, restart connect");
+          Log.log(1, "Responce has the wrong username, restart connect");
         }
         break;
       default:
-        System.out.println("not error or accept");
+        Log.log(0, "Incorrect message from server received");
       }
     } catch (SocketTimeoutException e1) {
-      System.out.println("timed out");
+      Log.log(0, "Sent Request and didn't get any response, while waiting for connection");
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -172,20 +238,16 @@ public class Client_Run {
       status = 3;
       // start map making and the AI
     } else {
-      System.out.println("someone strange wants to connect to you");
+      Log.log(0, "Server didn't send correct UUID, intruder in the system");
     }
   }
 
   private Map<String, String> parse_request_map(DatagramPacket incoming) {
-    // block : as inputs
     String[] vars_dirty = new String(incoming.getData()).split(":");
-    // String[] vars = Arrays.copyOfRange(vars_dirty, 1, vars_dirty.length);
     Map<String, String> map_vars = new HashMap<String, String>();
     for (int i = 1; i < (vars_dirty.length - 1); i++) {
-      // block = as inputs
       String[] temp = vars_dirty[i].split("=");
       map_vars.put(temp[0], temp[1]);
-      // System.out.println("Packet Content " + temp[1]);
     }
     return map_vars;
   }
@@ -197,14 +259,14 @@ public class Client_Run {
 
   private byte[] create_packet_string(String command_word, String[] keys, String[] values) {
     if (keys.length != values.length) {
-      System.out.println("The the command: " + command_word + " the keys and values don't match");
+      Log.log(1, "The the command: " + command_word + " the keys and values don't match");
       throw new ArrayIndexOutOfBoundsException();
     } else {
       String packet_string = command_word + ":";
       for (int j = 0; j < keys.length; j++) {
         packet_string += keys[j] + "=" + values[j] + ":";
       }
-      System.out.println(packet_string);
+      Log.log(1, "Sending: " + packet_string);
 
       return packet_string.getBytes();
     }
@@ -217,9 +279,9 @@ public class Client_Run {
       String[] values = { uuid.toString(), Integer.toString(status) };
       byte[] send_ping_data = create_packet_string(command_word, keys, values);
       send_packets(send_ping_data);
-      System.out.println("sent ping");
+      Log.log(1, "Sent ping");
     } catch (NullPointerException e) {
-      System.out.println("bad ping");
+      Log.log(0, "Sent ping request malformed");
     }
 
   }
@@ -234,18 +296,18 @@ public class Client_Run {
       Map variables = parse_request_map(receive_packet);
       switch (command_type) {
       case "error":
-        System.out.println(variables.get("message"));
+        Log.log(0, "Error from server: " + variables.get("message"));
         break;
       case "pingback":
         status = Integer.parseInt((String) variables.get("status"));
-        System.out.println("received ping");
+        Log.log(1, "Received ping-back");
         break;
       default:
-        System.out.println("not error or ping");
+        Log.log(0, "Incorrect message from server received");
       }
     } catch (SocketTimeoutException e1) {
       // nothing happened
-      System.out.println("didn't receive anything back");
+      Log.log(0, "Sent Request and didn't get any response, while waiting for connection");
       status = 0;
     } catch (IOException e) {
       e.printStackTrace();

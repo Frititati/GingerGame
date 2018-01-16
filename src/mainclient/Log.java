@@ -1,4 +1,4 @@
-package mainserver;
+package mainclient;
 
 import java.io.IOException;
 import java.util.logging.FileHandler;
@@ -14,17 +14,18 @@ public class Log {
       FileHandler fh;
 
       // This block configure the logger with handler and formatter
-      fh = new FileHandler("MyServer.log", true);
+      fh = new FileHandler("MyClient.log", true);
       logger.addHandler(fh);
       SimpleFormatter formatter = new SimpleFormatter();
       fh.setFormatter(formatter);
 
-      // the following statement is used to log messages together with their level
+      // the following statement is used to log messages together with their
+      // level
       if (status == 0) {
         logger.severe(msg);
       } else if (status == 2) {
         logger.warning(msg);
-      } else if (status == 1){
+      } else if (status == 1) {
         logger.info(msg);
       }
     } catch (SecurityException e) {
