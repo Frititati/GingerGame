@@ -7,11 +7,10 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 
 public class Drawer extends Component {
-  public static int square = 13;
+  public static int square = 60;
 
   public void paint(Graphics g) {
     g.setColor(Color.BLACK);
@@ -20,7 +19,6 @@ public class Drawer extends Component {
       g.drawString("Waiting to Play", 10, 10);
     } else {
       g.drawString("Playing", 10, 10);
-
     }
 
     BufferedImage grass = null;
@@ -37,8 +35,8 @@ public class Drawer extends Component {
     for (int i = 0; i < 4; i++) {
       char[] allchar = Client_Run.client_map[i].toCharArray();
       for (int j = 0; j < 4; j++) {
-        int x = j * square + 10;
-        int y = i * square + 10;
+        int x = j * square + 70;
+        int y = i * square + 70;
         switch (allchar[j]) {
         case 'g':
           g.drawImage(grass, x, y - square, null);

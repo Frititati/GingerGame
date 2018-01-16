@@ -25,6 +25,7 @@ public class Client_Run {
   private UUID uuid;
   public static String[] client_map = { "0000", "0000", "0000", "0000" };
   public static boolean gen_map = false;
+  private static JApplet applet;
 
   public Client_Run() {
     try {
@@ -146,6 +147,7 @@ public class Client_Run {
     map_split[2] = to_be_split.substring(7, 11);
     map_split[3] = to_be_split.substring(11, 15);
     client_map = map_split;
+    applet.repaint();
     return client_map;
   }
 
@@ -163,6 +165,7 @@ public class Client_Run {
         break;
       case "playstart":
         check_play_status(variables);
+        applet.repaint();
         break;
       default:
         Log.log(0, "Sent Request was malformed");
@@ -316,11 +319,12 @@ public class Client_Run {
 
   public static void main(String[] args) {
     JFrame frame = new JFrame("Client Game");
-    JApplet applet = new JAppletControl();
+    applet = new JAppletControl();
     frame.add(applet);
     frame.pack();
     frame.setVisible(true);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setSize(500,500);
     Client_Run client = new Client_Run();
   }
 }
