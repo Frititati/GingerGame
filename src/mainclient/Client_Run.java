@@ -96,7 +96,7 @@ public class Client_Run {
   // water w
   // meddow g
   // mountain m
-  private char random_char(ArrayList<Character> r) {
+  public char random_char(ArrayList<Character> r) {
     int list_len = r.size();
     Random rand = new Random();
     int rand_char = rand.nextInt(list_len);
@@ -106,7 +106,7 @@ public class Client_Run {
   // water w
   // meddow g
   // mountain m
-  private String generate_map() {
+  public String generate_map() {
     String retval = "";
     int available_w = 6;
     int available_g = 6;
@@ -139,7 +139,7 @@ public class Client_Run {
     return retval;
   }
 
-  private String[] split_map() {
+  public String[] split_map() {
     String to_be_split = generate_map();
     String[] map_split = new String[4];
     map_split[0] = to_be_split.substring(0, 4);
