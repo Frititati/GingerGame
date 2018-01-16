@@ -12,18 +12,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Random;
-
-import sun.security.util.Length;
+import javax.swing.JApplet;
+import javax.swing.JFrame;
 
 public class Client_Run {
-  private int status = 0;
+  static int status = 0;
   private InetAddress server_ip;
   private int server_port = 9876;
   private DatagramSocket client_socket;
   private int id;
   private String name = "Test_Client";
   private UUID uuid;
-  public static String[] client_map;
+  public static String[] client_map = { "0000", "0000", "0000", "0000" };
   public static boolean gen_map = false;
 
   public Client_Run() {
@@ -124,15 +124,15 @@ public class Client_Run {
       }
       char char_selected = random_char(round_char);
       retval += char_selected;
-      switch(char_selected) {
+      switch (char_selected) {
       case 'w':
-    	  available_w--;
-    	  break;
+        available_w--;
+        break;
       case 'g':
-    	  available_g--;
-    	  break;
+        available_g--;
+        break;
       case 'm':
-    	  available_m--;
+        available_m--;
       }
     }
     return retval;
@@ -315,7 +315,12 @@ public class Client_Run {
   }
 
   public static void main(String[] args) {
+    JFrame frame = new JFrame("Client Game");
+    JApplet applet = new JAppletControl();
+    frame.add(applet);
+    frame.pack();
+    frame.setVisible(true);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     Client_Run client = new Client_Run();
   }
-
 }
